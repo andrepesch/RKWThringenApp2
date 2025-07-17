@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeParseException
 
 class RkwFormViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -25,15 +28,15 @@ class RkwFormViewModel(application: Application) : AndroidViewModel(application)
     private val _hasSavedData = MutableStateFlow(false)
     val hasSavedData: StateFlow<Boolean> = _hasSavedData.asStateFlow()
 
-    private val _wzSearchText = MutableStateFlow("")
-    val wzSearchText: StateFlow<String> = _wzSearchText.asStateFlow()
-
     private var fullWzList: List<String> = emptyList()
-    private val _filteredWzList = MutableStateFlow<List<String>>(emptyList())
-    val filteredWzList: StateFlow<List<String>> = _filteredWzList.asStateFlow()
+    val wzList: List<String> get() = fullWzList
 
     private val _isPlzError = MutableStateFlow(false)
     val isPlzError: StateFlow<Boolean> = _isPlzError.asStateFlow()
+
+    private val _isDateError = MutableStateFlow(false)
+    val isDateError: StateFlow<Boolean> = _isDateError.asStateFlow()
+
 
     init {
         loadWzData()
@@ -48,7 +51,6 @@ class RkwFormViewModel(application: Application) : AndroidViewModel(application)
             val inputStream = getApplication<Application>().resources.openRawResource(R.raw.wz2008)
             val reader = BufferedReader(InputStreamReader(inputStream))
             fullWzList = reader.readLines()
-            _filteredWzList.value = fullWzList
         }
     }
 
@@ -62,7 +64,6 @@ class RkwFormViewModel(application: Application) : AndroidViewModel(application)
         val dataAsJson = sharedPreferences.getString("formData", null)
         if (dataAsJson != null) {
             _uiState.value = gson.fromJson(dataAsJson, RkwFormData::class.java)
-            _wzSearchText.value = _uiState.value.industrySector
             _hasSavedData.value = true
         } else {
             _hasSavedData.value = false
@@ -71,33 +72,36 @@ class RkwFormViewModel(application: Application) : AndroidViewModel(application)
 
     fun startNewForm() {
         _uiState.value = RkwFormData()
-        _filteredWzList.value = fullWzList
-        _wzSearchText.value = ""
         sharedPreferences.edit().remove("formData").apply()
         _hasSavedData.value = false
     }
 
-    fun onWzSearchChanged(newQuery: String) {
-        _wzSearchText.value = newQuery
-        _filteredWzList.value = if (newQuery.isBlank()) {
-            fullWzList
-        } else {
-            fullWzList.filter { it.contains(newQuery, ignoreCase = true) }
+    fun onWzSelected(selectedWz: String) {
+        _uiState.update { it.copy(industrySector = selectedWz) }
+    }
+
+    fun updateCompanyName(name: String) { _uiState.update { it.copy(companyName = name) } }
+    fun updateLegalForm(legalForm: String) { _uiState.update { it.copy(legalForm = legalForm) } }
+
+    fun updateFoundationDate(date: String) {
+        val digitsOnly = date.filter { it.isDigit() }
+        if (digitsOnly.length <= 8) {
+            _uiState.update { it.copy(foundationDate = digitsOnly) }
+
+            if (digitsOnly.length == 8) {
+                try {
+                    val formatter = DateTimeFormatter.ofPattern("ddMMyyyy")
+                    val parsedDate = LocalDate.parse(digitsOnly, formatter)
+                    _isDateError.value = parsedDate.isAfter(LocalDate.now())
+                } catch (e: DateTimeParseException) {
+                    _isDateError.value = true
+                }
+            } else {
+                _isDateError.value = false
+            }
         }
     }
 
-    fun onWzSelected(selectedWz: String) {
-        _uiState.update { it.copy(industrySector = selectedWz) }
-        _wzSearchText.value = selectedWz
-    }
-
-    // Update-Funktionen
-    fun updateCompanyName(name: String) { _uiState.update { it.copy(companyName = name) } }
-    fun updateLegalForm(legalForm: String) { _uiState.update { it.copy(legalForm = legalForm) } }
-    fun updateFoundationDate(date: String) {
-        val digitsOnly = date.filter { it.isDigit() }
-        _uiState.update { it.copy(foundationDate = digitsOnly) }
-    }
     fun updateStreetAndNumber(street: String) { _uiState.update { it.copy(streetAndNumber = street) } }
     fun updatePostalCode(code: String) {
         if (code.length <= 5 && code.all { it.isDigit() }) {
