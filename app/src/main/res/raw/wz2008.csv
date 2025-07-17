@@ -1,0 +1,620 @@
+0111 Anbau von Getreide (ohne Reis), Hülsenfrüchten und Ölsaaten
+0112 Anbau von Reis
+0113 Anbau von Gemüse und Melonen sowie Wurzeln und Knollen 
+0114 Anbau von Zuckerrohr
+0115 Anbau von Tabak
+0116 Anbau von Faserpflanzen
+0119 Anbau von sonstigen einjährigen Pflanzen
+0121 Anbau von Wein- und Tafeltrauben
+0122 Anbau von tropischen und subtropischen Früchten
+0123 Anbau von Zitrusfrüchten
+0124 Anbau von Kern- und Steinobst
+0125 Anbau von sonstigem Obst und Nüssen
+0126 Anbau von ölhaltigen Früchten
+0127 Anbau von Pflanzen zur Herstellung von Getränken
+0128 Anbau von Gewürzpflanzen, Pflanzen für aromatische, narkotische und pharmazeutische Zwecke 
+0129 Anbau sonstiger mehrjähriger Pflanzen
+0130 Betrieb von Baumschulen sowie Anbau von Pflanzen zu Vermehrungszwecken
+0141 Haltung von Milchkühen
+0142 Haltung von anderen Rindern
+0143 Haltung von Pferden und Eseln
+0144 Haltung von Kamelen
+0145 Haltung von Schafen und Ziegen
+0146 Haltung von Schweinen
+0147 Haltung von Geflügel
+0149 Sonstige Tierhaltung
+0150 Gemischte Landwirtschaft
+0161 Erbringung von landwirtschaftlichen Dienstleistungen für den Pflanzenbau
+0162 Erbringung von landwirtschaftlichen Dienstleistungen für die Tierhaltung
+0163 Nach der Ernte anfallende Tätigkeiten in der pflanzlichen Erzeugung
+0164 Saatgutaufbereitung
+0170 Jagd, Fallenstellerei und damit verbundene Tätigkeiten
+0210 Forstwirtschaft 
+0220 Holzeinschlag
+0230 Sammeln von wild wachsenden Produkten (ohne Holz)
+0240 Erbringung von Dienstleistungen für Forstwirtschaft und Holzeinschlag
+0311 Meeresfischerei
+0312 Süßwasserfischerei
+0321 Meeresaquakultur
+0322 Süßwasseraquakultur
+0510 Steinkohlenbergbau
+0520 Braunkohlenbergbau
+0610 Gewinnung von Erdöl
+0620 Gewinnung von Erdgas
+0710 Eisenerzbergbau
+0721 Bergbau auf Uran- und Thoriumerze
+0729 Sonstiger NE-Metallerzbergbau
+0811 Gewinnung von Naturwerksteinen und Natursteinen, Kalk- und Gipsstein, Kreide und Schiefer
+0812 Gewinnung von Kies, Sand, Ton und Kaolin
+0891 Bergbau auf chemische und Düngemittelminerale
+0892 Torfgewinnung
+0893 Gewinnung von Salz
+0899 Gewinnung von Steinen und Erden a. n. g.
+0910 Erbringung von Dienstleistungen für die Gewinnung von Erdöl und Erdgas
+0990 Erbringung von Dienstleistungen für den sonstigen Bergbau und die Gewinnung von Steinen und Erden
+1011 Schlachten (ohne Schlachten von Geflügel)
+1012 Schlachten von Geflügel
+1013 Fleischverarbeitung
+1020 Fischverarbeitung
+1031 Kartoffelverarbeitung
+1032 Herstellung von Frucht- und Gemüsesäften
+1039 Sonstige Verarbeitung von Obst und Gemüse
+1041 Herstellung von Ölen und Fetten (ohne Margarine u.ä. Nahrungsfette)
+1042 Herstellung von Margarine u. ä. Nahrungsfetten
+1051 Milchverarbeitung (ohne Herstellung von Speiseeis)
+1052 Herstellung von Speiseeis
+1061 Mahl- und Schälmühlen
+1062 Herstellung von Stärke und Stärkeerzeugnissen
+1071 Herstellung von Backwaren (ohne Dauerbackwaren)
+1072 Herstellung von Dauerbackwaren
+1073 Herstellung von Teigwaren
+1081 Herstellung von Zucker
+1082 Herstellung von Süßwaren (ohne Dauerbackwaren)
+1083 Verarbeitung von Kaffee und Tee, Herstellung von Kaffee-Ersatz
+1084 Herstellung von Würzmitteln und Soßen
+1085 Herstellung von Fertiggerichten
+1086 Herstellung von homogenisierten und diätetischen Nahrungsmitteln
+1089 Herstellung von sonstigen Nahrungsmitteln a. n. g.
+1091 Herstellung von Futtermitteln für Nutztiere
+1092 Herstellung von Futtermitteln für sonstige Tiere
+1101 Herstellung von Spirituosen
+1102 Herstellung von Traubenwein
+1103 Herstellung von Apfelwein und anderen Fruchtweinen
+1104 Herstellung von Wermutwein und sonstigen aromatisierten Weinen
+1105 Herstellung von Bier
+1106 Herstellung von Malz
+1107 "Herstellung von Erfrischungsgetränken  Gewinnung natürlicher Mineralwässer "
+1200 Tabakverarbeitung
+1310 Spinnstoffaufbereitung und Spinnerei
+1320 Weberei
+1330 Veredlung von Textilien und Bekleidung
+1391 Herstellung von gewirktem und gestricktem Stoff
+1392 Herstellung von konfektionierten Textilwaren (ohne Bekleidung)
+1393 Herstellung von Teppichen
+1394 Herstellung von Seilerwaren
+1395 Herstellung von Vliesstoff und Erzeugnissen daraus (ohne Bekleidung)
+1396 Herstellung von technischen Textilien
+1399 Herstellung von sonstigen Textilwaren a. n. g.
+1411 Herstellung von Lederbekleidung
+1412 Herstellung von Arbeits- und Berufsbekleidung
+1413 Herstellung von sonstiger Oberbekleidung
+1414 Herstellung von Wäsche
+1419 Herstellung von sonstiger Bekleidung und Bekleidungszubehör a. n. g.
+1420 Herstellung von Pelzwaren
+1431 Herstellung von Strumpfwaren
+1439 Herstellung von sonstiger Bekleidung aus gewirktem und gestricktem Stoff
+1511 "Herstellung von Leder und Lederfaserstoff  Zurichtung und Färben von Fellen"
+1512 Lederverarbeitung (ohne Herstellung von Lederbekleidung)
+1520 Herstellung von Schuhen
+1610 Säge-, Hobel- und Holzimprägnierwerke
+1621 Herstellung von Furnier-, Sperrholz-, Holzfaser- und Holzspanplatten
+1622 Herstellung von Parketttafeln
+1623 Herstellung von sonstigen Konstruktionsteilen, Fertigbauteilen, Ausbauelementen und Fertigteilbauten aus Holz
+1624 Herstellung von Verpackungsmitteln, Lagerbehältern und Ladungsträgern aus Holz
+1629 Herstellung von Holzwaren a. n. g., Kork-, Flecht- und Korbwaren (ohne Möbel)
+1711 Herstellung von Holz- und Zellstoff
+1712 Herstellung von Papier, Karton und Pappe
+1721 Herstellung von Wellpapier und -pappe sowie von Verpackungsmitteln aus Papier, Karton und Pappe
+1722 Herstellung von Haushalts-, Hygiene- und Toilettenartikeln aus Zellstoff, Papier und Pappe
+1723 Herstellung von Schreibwaren und Bürobedarf aus Papier, Karton und Pappe
+1724 Herstellung von Tapeten
+1729 Herstellung von sonstigen Waren aus Papier, Karton und Pappe
+1811 Drucken von Zeitungen
+1812 Drucken a. n. g.
+1813 Druck- und Medienvorstufe
+1814 Binden von Druckerzeugnissen und damit verbundene Dienstleistungen
+1820 Vervielfältigung von bespielten Ton-, Bild- und Datenträgern
+1910 Kokerei
+1920 Mineralölverarbeitung
+2011 Herstellung von Industriegasen
+2012 Herstellung von Farbstoffen und Pigmenten
+2013 Herstellung von sonstigen anorganischen Grundstoffen und Chemikalien
+2014 Herstellung von sonstigen organischen Grundstoffen und Chemikalien
+2015 Herstellung von Düngemitteln und Stickstoffverbindungen
+2016 Herstellung von Kunststoffen in Primärformen
+2017 Herstellung von synthetischem Kautschuk in Primärformen
+2020 Herstellung von Schädlingsbekämpfungs-, Pflanzenschutz- und Desinfektionsmitteln
+2030 Herstellung von Anstrichmitteln, Druckfarben und Kitten
+2041 Herstellung von Seifen, Wasch-, Reinigungs- und Poliermitteln
+2042 Herstellung von Körperpflegemitteln und Duftstoffen
+2051 Herstellung von pyrotechnischen Erzeugnissen
+2052 Herstellung von Klebstoffen
+2053 Herstellung von etherischen Ölen
+2059 Herstellung von sonstigen chemischen Erzeugnissen a. n. g.
+2060 Herstellung von Chemiefasern
+2110 Herstellung von pharmazeutischen Grundstoffen
+2120 Herstellung von pharmazeutischen Spezialitäten und sonstigen pharmazeutischen Erzeugnissen
+2211 Herstellung und Runderneuerung von Bereifungen
+2219 Herstellung von sonstigen Gummiwaren
+2221 Herstellung von Platten, Folien, Schläuchen und Profilen aus Kunststoffen
+2222 Herstellung von Verpackungsmitteln aus Kunststoffen
+2223 Herstellung von Baubedarfsartikeln aus Kunststoffen
+2229 Herstellung von sonstigen Kunststoffwaren
+2311 Herstellung von Flachglas
+2312 Veredlung und Bearbeitung von Flachglas
+2313 Herstellung von Hohlglas
+2314 Herstellung von Glasfasern und Waren daraus
+2319 Herstellung, Veredlung und Bearbeitung von sonstigem Glas einschließlich technischen Glaswaren
+2320 Herstellung von feuerfesten keramischen Werkstoffen und Waren
+2331 "Herstellung von keramischen Wand- und Bodenfliesen und
+ -platten"
+2332 Herstellung von Ziegeln und sonstiger Baukeramik
+2341 Herstellung von keramischen Haushaltswaren und Ziergegenständen
+2342 Herstellung von Sanitärkeramik
+2343 Herstellung von Isolatoren und Isolierteilen aus Keramik
+2344 Herstellung von keramischen Erzeugnissen für sonstige technische Zwecke
+2349 Herstellung von sonstigen keramischen Erzeugnissen
+2351 Herstellung von Zement
+2352 Herstellung von Kalk und gebranntem Gips
+2361 Herstellung von Erzeugnissen aus Beton, Zement und Kalksandstein für den Bau
+2362 Herstellung von Gipserzeugnissen für den Bau
+2363 Herstellung von Frischbeton (Transportbeton)
+2364 Herstellung von Mörtel und anderem Beton (Trockenbeton)
+2365 Herstellung von Faserzementwaren
+2369 Herstellung von sonstigen Erzeugnissen aus Beton, Zement und Gips a. n. g.
+2370 Be- und Verarbeitung von Naturwerksteinen und Natursteinen a. n. g.
+2391 Herstellung von Schleifkörpern und Schleifmitteln auf Unterlage
+2399 Herstellung von sonstigen Erzeugnissen aus nichtmetallischen Mineralien a. n. g.
+2410 Erzeugung von Roheisen, Stahl und Ferrolegierungen
+2420 Herstellung von Stahlrohren, Rohrform-, Rohrverschluss- und Rohrverbindungsstücken aus Stahl
+2431 Herstellung von Blankstahl
+2432 "Herstellung von Kaltband mit einer Breite von weniger als
+600 mm"
+2433 Herstellung von Kaltprofilen
+2434 Herstellung von kaltgezogenem Draht
+2441 Erzeugung und erste Bearbeitung von Edelmetallen
+2442 Erzeugung und erste Bearbeitung von Aluminium
+2443 Erzeugung und erste Bearbeitung von Blei, Zink und Zinn
+2444 Erzeugung und erste Bearbeitung von Kupfer
+2445 Erzeugung und erste Bearbeitung von sonstigen NE-Metallen
+2446 Aufbereitung von Kernbrennstoffen
+2451 Eisengießereien
+2452 Stahlgießereien
+2453 Leichtmetallgießereien
+2454 Buntmetallgießereien
+2511 Herstellung von Metallkonstruktionen
+2512 Herstellung von Ausbauelementen aus Metall
+2521 Herstellung von Heizkörpern und -kesseln für Zentralheizungen
+2529 Herstellung von Sammelbehältern, Tanks u. ä. Behältern aus Metall
+2530 Herstellung von Dampfkesseln (ohne Zentralheizungskessel)
+2540 Herstellung von Waffen und Munition
+2550 Herstellung von Schmiede-, Press-, Zieh- und Stanzteilen, gewalzten Ringen und pulvermetallurgischen Erzeugnissen
+2561 Oberflächenveredlung und Wärmebehandlung
+2562 Mechanik a. n. g.
+2571 Herstellung von Schneidwaren und Bestecken aus unedlen Metallen
+2572 Herstellung von Schlössern und Beschlägen aus unedlen Metallen
+2573 Herstellung von Werkzeugen
+2591 Herstellung von Fässern, Trommeln, Dosen, Eimern u. ä. Behältern aus Metall
+2592 Herstellung von Verpackungen und Verschlüssen aus Eisen, Stahl und NE-Metall
+2593 Herstellung von Drahtwaren, Ketten und Federn
+2594 Herstellung von Schrauben und Nieten
+2599 Herstellung von sonstigen Metallwaren a. n. g.
+2611 Herstellung von elektronischen Bauelementen
+2612 Herstellung von bestückten Leiterplatten
+2620 Herstellung von Datenverarbeitungsgeräten und peripheren Geräten
+2630 Herstellung von Geräten und Einrichtungen der Telekommunikationstechnik
+2640 Herstellung von Geräten der Unterhaltungselektronik
+2651 Herstellung von Mess-, Kontroll-, Navigations- u. ä. Instrumenten und Vorrichtungen
+2652 Herstellung von Uhren
+2660 Herstellung von Bestrahlungs- und Elektrotherapiegeräten und elektromedizinischen Geräten
+2670 Herstellung von optischen und fotografischen Instrumenten und Geräten
+2680 Herstellung von magnetischen und optischen Datenträgern
+2711 Herstellung von Elektromotoren, Generatoren und Transformatoren
+2712 Herstellung von Elektrizitätsverteilungs- und -schalteinrichtungen
+2720 Herstellung von Batterien und Akkumulatoren
+2731 Herstellung von Glasfaserkabeln
+2732 Herstellung von sonstigen elektronischen und elektrischen Drähten und Kabeln
+2733 Herstellung von elektrischem Installationsmaterial
+2740 Herstellung von elektrischen Lampen und Leuchten
+2751 Herstellung von elektrischen Haushaltsgeräten
+2752 Herstellung von nicht elektrischen Haushaltsgeräten
+2790 Herstellung von sonstigen elektrischen Ausrüstungen und Geräten a. n. g.
+2811 Herstellung von Verbrennungsmotoren und Turbinen (ohne Motoren für Luft- und Straßenfahrzeuge)
+2812 Herstellung von hydraulischen und pneumatischen Komponenten und Systemen
+2813 Herstellung von Pumpen und Kompressoren a. n. g.
+2814 Herstellung von Armaturen a. n. g.
+2815 Herstellung von Lagern, Getrieben, Zahnrädern und Antriebselementen
+2821 Herstellung von Öfen und Brennern
+2822 Herstellung von Hebezeugen und Fördermitteln
+2823 Herstellung von Büromaschinen (ohne Datenverarbeitungsgeräte und periphere Geräte)
+2824 Herstellung von handgeführten Werkzeugen mit Motorantrieb
+2825 Herstellung von kälte- und lufttechnischen Erzeugnissen, nicht für den Haushalt
+2829 Herstellung von sonstigen nicht wirtschaftszweigspezifischen Maschinen a. n. g.
+2830 Herstellung von land- und forstwirtschaftlichen Maschinen
+2841 Herstellung von Werkzeugmaschinen für die Metallbearbeitung
+2849 Herstellung von sonstigen Werkzeugmaschinen 
+2891 Herstellung von Maschinen für die Metallerzeugung, von Walzwerkseinrichtungen und Gießmaschinen
+2892 Herstellung von Bergwerks-, Bau- und Baustoffmaschinen
+2893 Herstellung von Maschinen für die Nahrungs- und Genussmittelerzeugung und die Tabakverarbeitung
+2894 Herstellung von Maschinen für die Textil- und Bekleidungsherstellung und die Lederverarbeitung
+2895 "Herstellung von Maschinen für die Papiererzeugung und 
+-verarbeitung"
+2896 Herstellung von Maschinen für die Verarbeitung  von Kunststoffen und Kautschuk
+2899 Herstellung von Maschinen für sonstige bestimmte Wirtschaftszweige a. n. g.
+2910 Herstellung von Kraftwagen und Kraftwagenmotoren
+2920 Herstellung von Karosserien, Aufbauten und Anhängern
+2931 Herstellung elektrischer und elektronischer Ausrüstungsgegenstände für Kraftwagen
+2932 Herstellung von sonstigen Teilen und sonstigem Zubehör für Kraftwagen
+3011 Schiffbau (ohne Boots- und Yachtbau)
+3012 Boots- und Yachtbau
+3020 Schienenfahrzeugbau
+3030 Luft- und Raumfahrzeugbau
+3040 Herstellung von militärischen Kampffahrzeugen
+3091 Herstellung von Krafträdern
+3092 Herstellung von Fahrrädern sowie von Behindertenfahrzeugen
+3099 Herstellung von sonstigen Fahrzeugen a. n. g.
+3101 Herstellung von Büro- und Ladenmöbeln
+3102 Herstellung von Küchenmöbeln
+3103 Herstellung von Matratzen
+3109 Herstellung von sonstigen Möbeln
+3211 Herstellung von Münzen
+3212 Herstellung von Schmuck, Gold- und Silberschmiedewaren (ohne Fantasieschmuck)
+3213 Herstellung von Fantasieschmuck
+3220 Herstellung von Musikinstrumenten
+3230 Herstellung von Sportgeräten
+3240 Herstellung von Spielwaren
+3250 Herstellung von medizinischen und zahnmedizinischen Apparaten und Materialien
+3291 Herstellung von Besen und Bürsten
+3299 Herstellung von sonstigen Erzeugnissen a. n. g.
+3311 Reparatur von Metallerzeugnissen
+3312 Reparatur von Maschinen
+3313 Reparatur von elektronischen und optischen Geräten
+3314 Reparatur von elektrischen Ausrüstungen
+3315 Reparatur und Instandhaltung von Schiffen, Booten und Yachten
+3316 Reparatur und Instandhaltung von Luft- und Raumfahrzeugen
+3317 Reparatur und Instandhaltung von Fahrzeugen a. n. g.
+3319 Reparatur von sonstigen Ausrüstungen
+3320 Installation von Maschinen und Ausrüstungen a. n. g.
+3511 Elektrizitätserzeugung
+3512 Elektrizitätsübertragung
+3513 Elektrizitätsverteilung
+3514 Elektrizitätshandel
+3521 Gaserzeugung
+3522 Gasverteilung durch Rohrleitungen
+3523 Gashandel durch Rohrleitungen
+3530 Wärme- und Kälteversorgung
+3600 Wasserversorgung
+3700 Abwasserentsorgung
+3811 Sammlung nicht gefährlicher Abfälle
+3812 Sammlung gefährlicher Abfälle
+3821 Behandlung und Beseitigung nicht gefährlicher Abfälle
+3822 Behandlung und Beseitigung gefährlicher Abfälle
+3831 Zerlegen von Schiffs- und Fahrzeugwracks und anderen Altwaren
+3832 Rückgewinnung sortierter Werkstoffe
+3900 Beseitigung von Umweltverschmutzungen und sonstige Entsorgung
+4110 "Erschließung von Grundstücken  Bauträger"
+4120 Bau von Gebäuden
+4211 Bau von Straßen
+4212 Bau von Bahnverkehrsstrecken
+4213 Brücken- und Tunnelbau
+4221 Rohrleitungstiefbau, Brunnenbau und Kläranlagenbau
+4222 Kabelnetzleitungstiefbau
+4291 Wasserbau
+4299 Sonstiger Tiefbau a. n. g.
+4311 Abbrucharbeiten
+4312 Vorbereitende Baustellenarbeiten
+4313 Test- und Suchbohrung
+4321 Elektroinstallation
+4322 Gas-, Wasser-, Heizungs- sowie Lüftungs- und Klimainstallation
+4329 Sonstige Bauinstallation
+4331 Anbringen von Stuckaturen, Gipserei und Verputzerei
+4332 Bautischlerei und -schlosserei
+4333 Fußboden-, Fliesen- und Plattenlegerei, Tapeziererei
+4334 Malerei und Glaserei
+4339 Sonstiger Ausbau a. n. g.
+4391 Dachdeckerei und Zimmerei
+4399 Sonstige spezialisierte Bautätigkeiten a. n. g.
+4511 Handel mit Kraftwagen mit einem Gesamtgewicht von 3,5 t oder weniger
+4519 "Handel mit Kraftwagen mit einem Gesamtgewicht 
+von mehr als 3,5 t"
+4520 Instandhaltung und Reparatur von Kraftwagen
+4531 Großhandel mit Kraftwagenteilen und -zubehör
+4532 Einzelhandel mit Kraftwagenteilen und -zubehör
+4540 "Handel mit Krafträdern, Kraftradteilen und -zubehör  Instandhaltung und Reparatur von Krafträdern"
+4611 Handelsvermittlung von landwirtschaftlichen Grundstoffen, lebenden Tieren, textilen Rohstoffen und Halbwaren
+4612 Handelsvermittlung von Brennstoffen, Erzen, Metallen und technischen Chemikalien
+4613 Handelsvermittlung von Holz, Baustoffen und Anstrichmitteln
+4614 Handelsvermittlung von Maschinen, technischem Bedarf, Wasser- und Luftfahrzeugen
+4615 Handelsvermittlung von Möbeln, Einrichtungs- und Haushaltsgegenständen, Eisen- und Metallwaren
+4616 Handelsvermittlung von Textilien, Bekleidung, Schuhen und Lederwaren
+4617 Handelsvermittlung von Nahrungsmitteln, Getränken und Tabakwaren
+4618 Handelsvermittlung von sonstigen Waren
+4619 Handelsvermittlung von Waren ohne ausgeprägten Schwerpunkt
+4621 Großhandel mit Getreide, Rohtabak, Saatgut und Futtermitteln
+4622 Großhandel mit Blumen und Pflanzen
+4623 Großhandel mit lebenden Tieren
+4624 Großhandel mit Häuten, Fellen und Leder
+4631 Großhandel mit Obst, Gemüse und Kartoffeln
+4632 Großhandel mit Fleisch und Fleischwaren
+4633 Großhandel mit Milch, Milcherzeugnissen, Eiern, Speiseölen und Nahrungsfetten
+4634 Großhandel mit Getränken
+4635 Großhandel mit Tabakwaren
+4636 Großhandel mit Zucker, Süßwaren und Backwaren
+4637 Großhandel mit Kaffee, Tee, Kakao und Gewürzen
+4638 Großhandel mit sonstigen Nahrungs- und Genussmitteln
+4639 Großhandel mit Nahrungs- und Genussmitteln, Getränken und Tabakwaren, ohne ausgeprägten Schwerpunkt
+4641 Großhandel mit Textilien
+4642 Großhandel mit Bekleidung und Schuhen
+4643 Großhandel mit Foto- und optischen Erzeugnissen, elektrischen Haushaltsgeräten und Geräten der Unterhaltungselektronik
+4644 Großhandel mit keramischen Erzeugnissen, Glaswaren und Reinigungsmitteln
+4645 Großhandel mit kosmetischen Erzeugnissen und Körperpflegemitteln
+4646 Großhandel mit pharmazeutischen, medizinischen und orthopädischen Erzeugnissen
+4647 Großhandel mit Möbeln, Teppichen, Lampen und Leuchten
+4648 Großhandel mit Uhren und Schmuck
+4649 Großhandel mit sonstigen Gebrauchs- und Verbrauchsgütern
+4651 Großhandel mit Datenverarbeitungsgeräten, peripheren Geräten und Software
+4652 Großhandel mit elektronischen Bauteilen und Telekommunikationsgeräten
+4661 Großhandel mit landwirtschaftlichen Maschinen und Geräten
+4662 Großhandel mit Werkzeugmaschinen
+4663 Großhandel mit Bergwerks-, Bau- und Baustoffmaschinen
+4664 Großhandel mit Textil-, Näh- und Strickmaschinen
+4665 Großhandel mit Büromöbeln
+4666 Großhandel mit sonstigen Büromaschinen und -einrichtungen
+4669 Großhandel mit sonstigen Maschinen und Ausrüstungen
+4671 Großhandel mit festen Brennstoffen und Mineralölerzeugnissen
+4672 Großhandel mit Erzen, Metallen und Metallhalbzeug
+4673 Großhandel mit Holz, Baustoffen, Anstrichmitteln und Sanitärkeramik
+4674 Großhandel mit Metall- und Kunststoffwaren für Bauzwecke sowie Installationsbedarf für Gas, Wasser und Heizung
+4675 Großhandel mit chemischen Erzeugnissen
+4676 Großhandel mit sonstigen Halbwaren
+4677 Großhandel mit Altmaterialien und Reststoffen
+4690 Großhandel ohne ausgeprägten Schwerpunkt
+4711 Einzelhandel mit Waren verschiedener Art, Hauptrichtung Nahrungs- und Genussmittel, Getränke und Tabakwaren
+4719 Sonstiger Einzelhandel mit Waren verschiedener Art
+4721 Einzelhandel mit Obst, Gemüse und Kartoffeln 
+4722 Einzelhandel mit Fleisch und Fleischwaren 
+4723 Einzelhandel mit Fisch, Meeresfrüchten und Fischerzeugnissen 
+4724 Einzelhandel mit Back- und Süßwaren 
+4725 Einzelhandel mit Getränken 
+4726 Einzelhandel mit Tabakwaren 
+4729 Sonstiger Einzelhandel mit Nahrungs- und Genussmitteln
+4730 Einzelhandel mit Motorenkraftstoffen (Tankstellen)
+4741 Einzelhandel mit Datenverarbeitungsgeräten, peripheren Geräten und Software 
+4742 Einzelhandel mit Telekommunikationsgeräten 
+4743 Einzelhandel mit Geräten der Unterhaltungselektronik
+4751 Einzelhandel mit Textilien 
+4752 Einzelhandel mit Metallwaren, Anstrichmitteln, Bau- und Heimwerkerbedarf 
+4753 Einzelhandel mit Vorhängen, Teppichen, Fußbodenbelägen und Tapeten 
+4754 Einzelhandel mit elektrischen Haushaltsgeräten 
+4759 Einzelhandel mit Möbeln, Einrichtungsgegenständen und sonstigem Hausrat
+4761 Einzelhandel mit Büchern 
+4762 Einzelhandel mit Zeitschriften, Zeitungen, Schreibwaren und Bürobedarf 
+4763 Einzelhandel mit bespielten Ton- und Bildträgern
+4764 Einzelhandel mit Fahrrädern, Sport- und Campingartikeln
+4765 Einzelhandel mit Spielwaren 
+4771 Einzelhandel mit Bekleidung
+4772 Einzelhandel mit Schuhen und Lederwaren 
+4773 Apotheken
+4774 Einzelhandel mit medizinischen und orthopädischen Artikeln 
+4775 Einzelhandel mit kosmetischen Erzeugnissen und Körperpflegemitteln
+4776 Einzelhandel mit Blumen, Pflanzen, Sämereien, Düngemitteln, zoologischem Bedarf und lebenden Tieren
+4777 Einzelhandel mit Uhren und Schmuck 
+4778 Sonstiger Einzelhandel in Verkaufsräumen (ohne Antiquitäten und Gebrauchtwaren)
+4779 Einzelhandel mit Antiquitäten und Gebrauchtwaren
+4781 Einzelhandel mit Nahrungs- und Genussmitteln, Getränken und Tabakwaren an Verkaufsständen und auf Märkten
+4782 Einzelhandel mit Textilien, Bekleidung und Schuhen an Verkaufsständen und auf Märkten
+4789 Einzelhandel mit sonstigen Gütern an Verkaufsständen und auf Märkten
+4791 Versand- und Internet-Einzelhandel
+4799 Sonstiger Einzelhandel, nicht in Verkaufsräumen, an Verkaufsständen oder auf Märkten
+4910 Personenbeförderung im Eisenbahnfernverkehr 
+4920 Güterbeförderung im Eisenbahnverkehr 
+4931 Personenbeförderung im Nahverkehr zu Lande (ohne Taxis)
+4932 Betrieb von Taxis
+4939 Sonstige Personenbeförderung im Landverkehr a. n. g.
+4941 Güterbeförderung im Straßenverkehr
+4942 Umzugstransporte
+4950 Transport in Rohrfernleitungen
+5010 Personenbeförderung in der See- und Küstenschifffahrt
+5020 Güterbeförderung in der See- und Küstenschifffahrt
+5030 Personenbeförderung in der Binnenschifffahrt
+5040 Güterbeförderung in der Binnenschifffahrt
+5110 Personenbeförderung in der Luftfahrt
+5121 Güterbeförderung in der Luftfahrt
+5122 Raumtransport
+5210 Lagerei
+5221 Erbringung von sonstigen Dienstleistungen für den Landverkehr
+5222 Erbringung von sonstigen Dienstleistungen für die Schifffahrt
+5223 Erbringung von sonstigen Dienstleistungen für die Luftfahrt
+5224 Frachtumschlag
+5229 Erbringung von sonstigen Dienstleistungen für den Verkehr a. n. g.
+5310 Postdienste von Universaldienstleistungsanbietern
+5320 Sonstige Post-, Kurier- und Expressdienste
+5510 Hotels, Gasthöfe und Pensionen
+5520 Ferienunterkünfte und ähnliche Beherbergungsstätten
+5530 Campingplätze
+5590 Sonstige Beherbergungsstätten
+5610 Restaurants, Gaststätten, Imbissstuben, Cafés, Eissalons u. Ä.
+5621 Event-Caterer
+5629 Erbringung sonstiger Verpflegungsdienstleistungen
+5630 Ausschank von Getränken
+5811 Verlegen von Büchern
+5812 Verlegen von Adressbüchern und Verzeichnissen
+5813 Verlegen von Zeitungen
+5814 Verlegen von Zeitschriften
+5819 Sonstiges Verlagswesen (ohne Software)
+5821 Verlegen von Computerspielen
+5829 Verlegen von sonstiger Software
+5911 Herstellung von Filmen, Videofilmen und Fernsehprogrammen
+5912 Nachbearbeitung und sonstige Filmtechnik
+5913 Filmverleih und -vertrieb (ohne Videotheken)
+5914 Kinos
+5920 "Tonstudios  Herstellung von Hörfunkbeiträgen  Verlegen von bespielten Tonträgern und Musikalien"
+6010 Hörfunkveranstalter
+6020 Fernsehveranstalter
+6110 Leitungsgebundene Telekommunikation
+6120 Drahtlose Telekommunikation
+6130 Satellitentelekommunikation
+6190 Sonstige Telekommunikation
+6201 Programmierungstätigkeiten
+6202 Erbringung von Beratungsleistungen auf dem Gebiet der Informationstechnologie
+6203 Betrieb von Datenverarbeitungseinrichtungen für Dritte
+6209 Erbringung von sonstigen Dienstleistungen der Informationstechnologie
+6311 Datenverarbeitung, Hosting und damit verbundene Tätigkeiten
+6312 Webportale
+6391 Korrespondenz- und Nachrichtenbüros
+6399 Erbringung von sonstigen Informationsdienstleistungen a. n. g.
+6411 Zentralbanken
+6419 Kreditinstitute (ohne Spezialkreditinstitute)
+6420 Beteiligungsgesellschaften
+6430 Treuhand- und sonstige Fonds und ähnliche Finanzinstitutionen
+6491 Institutionen für Finanzierungsleasing
+6492 Spezialkreditinstitute
+6499 Sonstige Finanzdienstleistungen a. n. g.
+6511 Lebensversicherungen
+6512 Nichtlebensversicherungen
+6520 Rückversicherungen
+6530 Pensionskassen und Pensionsfonds
+6611 Effekten- und Warenbörsen
+6612 Effekten- und Warenhandel
+6619 Sonstige mit Finanzdienstleistungen verbundene Tätigkeiten
+6621 Risiko- und Schadensbewertung
+6622 Tätigkeit von Versicherungsmaklerinnen und -maklern
+6629 Sonstige mit Versicherungsdienstleistungen und Pensionskassen verbundene Tätigkeiten
+6630 Fondsmanagement
+6810 Kauf und Verkauf von eigenen Grundstücken, Gebäuden und Wohnungen
+6820 Vermietung, Verpachtung von eigenen oder geleasten Grundstücken, Gebäuden und Wohnungen
+6831 Vermittlung von Grundstücken, Gebäuden und Wohnungen für Dritte
+6832 Verwaltung von Grundstücken, Gebäuden und Wohnungen für Dritte
+6910 Rechtsberatung
+6920 "Wirtschaftsprüfung und Steuerberatung  Buchführung"
+7010 Verwaltung und Führung von Unternehmen und Betrieben
+7021 Public-Relations-Beratung
+7022 Unternehmensberatung
+7111 Architekturbüros
+7112 Ingenieurbüros
+7120 Technische, physikalische und chemische Untersuchung
+7211 Forschung und Entwicklung im Bereich Biotechnologie
+7219 Sonstige Forschung und Entwicklung im Bereich Natur-, Ingenieur-, Agrarwissenschaften und Medizin
+7220 Forschung und Entwicklung im Bereich Rechts-, Wirtschafts- und Sozialwissenschaften sowie im Bereich Sprach-, Kultur- und Kunstwissenschaften
+7311 Werbeagenturen
+7312 Vermarktung und Vermittlung von Werbezeiten und Werbeflächen
+7320 Markt- und Meinungsforschung
+7410 Ateliers für Textil-, Schmuck-, Grafik- u. ä. Design
+7420 Fotografie und Fotolabors
+7430 Übersetzen und Dolmetschen
+7490 Sonstige freiberufliche, wissenschaftliche und technische Tätigkeiten a. n. g.
+7500 Veterinärwesen
+7711 Vermietung von Kraftwagen mit einem Gesamtgewicht von 3,5 t oder weniger
+7712 Vermietung von Kraftwagen mit einem Gesamtgewicht von mehr als 3,5 t
+7721 Vermietung von Sport- und Freizeitgeräten
+7722 Videotheken
+7729 Vermietung von sonstigen Gebrauchsgütern
+7731 Vermietung von landwirtschaftlichen Maschinen und Geräten
+7732 Vermietung von Baumaschinen und -geräten
+7733 "Vermietung von Büromaschinen, Datenverarbeitungsgeräten und 
+-einrichtungen"
+7734 Vermietung von Wasserfahrzeugen
+7735 Vermietung von Luftfahrzeugen
+7739 Vermietung von sonstigen Maschinen, Geräten und beweglichen Sachen a. n. g.
+7740 Leasing von nichtfinanziellen immateriellen Vermögensgegenständen (ohne Copyrights)
+7810 Vermittlung von Arbeitskräften
+7820 Befristete Überlassung von Arbeitskräften
+7830 Sonstige Überlassung von Arbeitskräften
+7911 Reisebüros
+7912 Reiseveranstalter
+7990 Erbringung sonstiger Reservierungsdienstleistungen
+8010 Private Wach- und Sicherheitsdienste
+8020 Sicherheitsdienste mithilfe von Überwachungs- und Alarmsystemen
+8030 Detekteien
+8110 Hausmeisterdienste
+8121 Allgemeine Gebäudereinigung
+8122 Spezielle Reinigung von Gebäuden und  Reinigung von Maschinen
+8129 Reinigung a. n. g.
+8130 Garten- und Landschaftsbau sowie Erbringung von sonstigen gärtnerischen Dienstleistungen
+8211 Allgemeine Sekretariats- und Schreibdienste
+8219 "Copy-Shops  Dokumentenvorbereitung und Erbringung sonstiger spezieller Sekretariatsdienste"
+8220 Call Center
+8230 Messe-, Ausstellungs- und Kongressveranstalter
+8291 Inkassobüros und Auskunfteien
+8292 Abfüllen und Verpacken
+8299 Erbringung sonstiger wirtschaftlicher Dienstleistungen für Unternehmen und Privatpersonen a. n. g.
+8411 Allgemeine öffentliche Verwaltung
+8412 Öffentliche Verwaltung auf den Gebieten Gesundheitswesen, Bildung, Kultur und Sozialwesen
+8413 Wirtschaftsförderung, -ordnung und -aufsicht
+8421 Auswärtige Angelegenheiten
+8422 Verteidigung
+8423 Rechtspflege
+8424 Öffentliche Sicherheit und Ordnung
+8425 Feuerwehren
+8430 Sozialversicherung
+8510 Kindergärten und Vorschulen
+8520 Grundschulen
+8531 Allgemein bildende weiterführende Schulen
+8532 Berufsbildende weiterführende Schulen
+8541 Post-sekundärer, nicht tertiärer Unterricht
+8542 Tertiärer Unterricht
+8551 Sport- und Freizeitunterricht
+8552 Kulturunterricht
+8553 Fahr- und Flugschulen
+8559 Sonstiger Unterricht a. n. g.
+8560 Erbringung von Dienstleistungen für den Unterricht
+8610 Krankenhäuser
+8621 Arztpraxen für Allgemeinmedizin
+8622 Facharztpraxen
+8623 Zahnarztpraxen
+8690 Gesundheitswesen a. n. g.
+8710 Pflegeheime
+8720 Stationäre Einrichtungen zur psychosozialen Betreuung, Suchtbekämpfung u. Ä. 
+8730 "Altenheime  Alten- und Behindertenwohnheime"
+8790 Sonstige Heime (ohne Erholungs- und Ferienheime)
+8810 Soziale Betreuung älterer Menschen und Behinderter
+8891 Tagesbetreuung von Kindern
+8899 Sonstiges Sozialwesen a. n. g.
+9001 Darstellende Kunst
+9002 Erbringung von Dienstleistungen für die darstellende Kunst
+9003 Künstlerisches und schriftstellerisches Schaffen
+9004 Betrieb von Kultur- und Unterhaltungseinrichtungen
+9101 Bibliotheken und Archive
+9102 Museen
+9103 Betrieb von historischen Stätten und Gebäuden und ähnlichen Attraktionen
+9104 Botanische und zoologische Gärten sowie Naturparks
+9200 Spiel-, Wett- und Lotteriewesen
+9311 Betrieb von Sportanlagen
+9312 Sportvereine
+9313 Fitnesszentren
+9319 Erbringung von sonstigen Dienstleistungen des Sports
+9321 Vergnügungs- und Themenparks
+9329 Erbringung von Dienstleistungen der Unterhaltung und der Erholung a. n. g.
+9411 Wirtschafts- und Arbeitgeberverbände
+9412 Berufsorganisationen
+9420 Arbeitnehmervereinigungen
+9491 Kirchliche und sonstige religiöse Vereinigungen
+9492 Politische Parteien und Vereinigungen
+9499 Sonstige Interessenvertretungen und Vereinigungen a. n. g.
+9511 Reparatur von Datenverarbeitungsgeräten und peripheren Geräten
+9512 Reparatur von Telekommunikationsgeräten
+9521 Reparatur von Geräten der Unterhaltungselektronik
+9522 Reparatur von elektrischen Haushaltsgeräten und Gartengeräten
+9523 Reparatur von Schuhen und Lederwaren
+9524 Reparatur von Möbeln und Einrichtungsgegenständen
+9525 Reparatur von Uhren und Schmuck
+9529 Reparatur von sonstigen Gebrauchsgütern
+9601 Wäscherei und chemische Reinigung
+9602 Frisör- und Kosmetiksalons
+9603 Bestattungswesen
+9604 Saunas, Solarien, Bäder u. Ä.
+9609 Erbringung von sonstigen Dienstleistungen a. n. g.
+9700 Private Haushalte mit Hauspersonal
+9810 Herstellung von Waren durch private Haushalte für den Eigenbedarf ohne ausgeprägten Schwerpunkt
+9820 Erbringungen von Dienstleistungen durch private Haushalte für den Eigenbedarf ohne ausgeprägten Schwerpunkt
+9900 Exterritoriale Organisationen und Körperschaften
