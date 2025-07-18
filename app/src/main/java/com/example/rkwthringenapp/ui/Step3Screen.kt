@@ -1,23 +1,34 @@
 package com.example.rkwthringenapp.ui
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.rkwthringenapp.data.FinancialYear
+import com.example.rkwthringenapp.ui.util.CurrencyVisualTransformation
+import com.example.rkwthringenapp.ui.util.IbanVisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Step3Screen(navController: NavController, viewModel: RkwFormViewModel) {
     val formData by viewModel.uiState.collectAsState()
+    val isIbanError by viewModel.isIbanError.collectAsState()
     val stepLabels = listOf("Unternehmensdaten", "Ansprechpartner", "Finanzdaten", "Beratung", "Berater", "Abschluss")
+
+    var penultimateYearVisible by remember { mutableStateOf(false) }
+    var lastYearVisible by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = { RkwAppBar() }
@@ -35,87 +46,163 @@ fun Step3Screen(navController: NavController, viewModel: RkwFormViewModel) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text("Bankverbindung & Steuern", style = MaterialTheme.typography.titleLarge)
-            OutlinedTextField(
-                value = formData.bankDetails.institute,
-                onValueChange = { viewModel.updateBankInstitute(it) },
-                label = { Text("Kreditinstitut") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            OutlinedTextField(value = formData.bankDetails.institute, onValueChange = { viewModel.updateBankInstitute(it) }, label = { Text("Kreditinstitut") }, modifier = Modifier.fillMaxWidth())
             OutlinedTextField(
                 value = formData.bankDetails.iban,
                 onValueChange = { viewModel.updateIban(it) },
                 label = { Text("IBAN") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = IbanVisualTransformation(),
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters, autoCorrect = false, keyboardType = KeyboardType.Ascii),
+                isError = isIbanError,
+                supportingText = { if (isIbanError) Text("IBAN ungültig") }
             )
-            OutlinedTextField(
-                value = formData.bankDetails.taxId,
-                onValueChange = { viewModel.updateTaxId(it) },
-                label = { Text("USt-ID oder Steuer-Nr.") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            OutlinedTextField(value = formData.bankDetails.taxId, onValueChange = { viewModel.updateTaxId(it) }, label = { Text("USt-ID oder Steuer-Nr.") }, modifier = Modifier.fillMaxWidth())
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            Text("KMU-Einstufung (letzte 2 Jahresabschlüsse)", style = MaterialTheme.typography.titleLarge)
+            Text("KMU-Einstufung", style = MaterialTheme.typography.titleLarge)
+            InfoBox(text = "Die Einstufung als kleines oder mittleres Unternehmen (KMU) ist Voraussetzung für den Zugang zu vielen Förderprogrammen. Die Angaben der letzten beiden abgeschlossenen Geschäftsjahre sind dafür entscheidend.")
 
-            Text("Vorletzter Jahresabschluss", style = MaterialTheme.typography.titleMedium)
-            val penultimate = formData.smeClassification.penultimateYear
-            OutlinedTextField(
-                value = if(penultimate.employees == 0) "" else penultimate.employees.toString(),
-                onValueChange = { viewModel.updateFinancialYear(false, penultimate.copy(employees = it.toIntOrNull() ?: 0)) },
-                label = { Text("Anzahl Vollzeitbeschäftigte") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = if(penultimate.turnover == 0.0) "" else penultimate.turnover.toString(),
-                onValueChange = { viewModel.updateFinancialYear(false, penultimate.copy(turnover = it.toDoubleOrNull() ?: 0.0)) },
-                label = { Text("Jahresumsatz in €") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = if(penultimate.balanceSheetTotal == 0.0) "" else penultimate.balanceSheetTotal.toString(),
-                onValueChange = { viewModel.updateFinancialYear(false, penultimate.copy(balanceSheetTotal = it.toDoubleOrNull() ?: 0.0)) },
-                label = { Text("Jahresbilanzsumme in €") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
+            Button(onClick = { lastYearVisible = !lastYearVisible }, modifier = Modifier.fillMaxWidth()) {
+                Text(if (lastYearVisible) "Letzten Jahresabschluss ausblenden" else "Letzten Jahresabschluss hinzufügen")
+            }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            AnimatedVisibility(visible = lastYearVisible) {
+                FinancialYearCard(
+                    title = "Letzter Jahresabschluss",
+                    financialYear = formData.smeClassification.lastYear,
+                    availableYears = viewModel.availableYears,
+                    onUpdate = { updatedYear -> viewModel.updateFinancialYear(true, updatedYear) }
+                )
+            }
 
-            Text("Letzter Jahresabschluss", style = MaterialTheme.typography.titleMedium)
-            val last = formData.smeClassification.lastYear
-            OutlinedTextField(
-                value = if(last.employees == 0) "" else last.employees.toString(),
-                onValueChange = { viewModel.updateFinancialYear(true, last.copy(employees = it.toIntOrNull() ?: 0)) },
-                label = { Text("Anzahl Vollzeitbeschäftigte") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = if(last.turnover == 0.0) "" else last.turnover.toString(),
-                onValueChange = { viewModel.updateFinancialYear(true, last.copy(turnover = it.toDoubleOrNull() ?: 0.0)) },
-                label = { Text("Jahresumsatz in €") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = if(last.balanceSheetTotal == 0.0) "" else last.balanceSheetTotal.toString(),
-                onValueChange = { viewModel.updateFinancialYear(true, last.copy(balanceSheetTotal = it.toDoubleOrNull() ?: 0.0)) },
-                label = { Text("Jahresbilanzsumme in €") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
+            Button(onClick = { penultimateYearVisible = !penultimateYearVisible }, modifier = Modifier.fillMaxWidth()) {
+                Text(if (penultimateYearVisible) "Vorletzten Jahresabschluss ausblenden" else "Vorletzten Jahresabschluss hinzufügen")
+            }
+
+            AnimatedVisibility(visible = penultimateYearVisible) {
+                FinancialYearCard(
+                    title = "Vorletzter Jahresabschluss",
+                    financialYear = formData.smeClassification.penultimateYear,
+                    availableYears = viewModel.availableYears,
+                    onUpdate = { updatedYear -> viewModel.updateFinancialYear(false, updatedYear) }
+                )
+            }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(onClick = { navController.popBackStack() }) { Text("Zurück") }
-                // ÄNDERUNG: Navigiert jetzt zu "step4"
                 Button(onClick = { navController.navigate("step4") }) { Text("Weiter") }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FinancialYearCard(
+    title: String,
+    financialYear: FinancialYear,
+    availableYears: List<String>,
+    onUpdate: (FinancialYear) -> Unit
+) {
+    var yearDropdownExpanded by remember { mutableStateOf(false) }
+    var showEmployeeInfoDialog by remember { mutableStateOf(false) }
+
+    // HIER DER NEUE DIALOG FÜR DIE MITARBEITER-INFO
+    if (showEmployeeInfoDialog) {
+        AlertDialog(
+            onDismissRequest = { showEmployeeInfoDialog = false },
+            title = { Text("Berechnung der Mitarbeiterzahl (JAE)") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Die Mitarbeiterzahl wird in Jahresarbeitseinheiten (JAE) ausgedrückt.", fontWeight = FontWeight.Bold)
+                    Text("• Vollzeit-, Teilzeit- und Saisonarbeitskräfte zählen anteilig (z.B. 2 Halbzeitkräfte = 1 JAE).")
+                    Text("• Nicht einbezogen werden: Auszubildende und Personen im Mutterschafts- oder Elternurlaub.")
+                    Divider(modifier = Modifier.padding(vertical = 4.dp))
+                    Text("Beispiel:", fontWeight = FontWeight.Bold)
+                    Text("1 Vollzeitkraft = 1,0 JAE\n3 Teilzeitkräfte (50%) = 1,5 JAE\n1 Saisonkraft (3 Mon.) = 0,25 JAE\n= Insgesamt 2,75 JAE")
+                }
+            },
+            confirmButton = {
+                Button(onClick = { showEmployeeInfoDialog = false }) {
+                    Text("Schließen")
+                }
+            }
+        )
+    }
+
+    Card(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium)
+
+            ExposedDropdownMenuBox(
+                expanded = yearDropdownExpanded,
+                onExpandedChange = { yearDropdownExpanded = !yearDropdownExpanded }
+            ) {
+                OutlinedTextField(
+                    value = financialYear.year,
+                    onValueChange = { },
+                    readOnly = true,
+                    label = { Text("Abschlussjahr") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = yearDropdownExpanded) },
+                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                )
+                ExposedDropdownMenu(
+                    expanded = yearDropdownExpanded,
+                    onDismissRequest = { yearDropdownExpanded = false }
+                ) {
+                    availableYears.forEach { year ->
+                        DropdownMenuItem(
+                            text = { Text(year) },
+                            onClick = {
+                                onUpdate(financialYear.copy(year = year))
+                                yearDropdownExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            // HIER DAS NEUE INFO-ICON
+            OutlinedTextField(
+                value = if(financialYear.employees == 0) "" else financialYear.employees.toString(),
+                onValueChange = { onUpdate(financialYear.copy(employees = it.toIntOrNull() ?: 0)) },
+                label = { Text("Anzahl Mitarbeiter (JAE)") },
+                trailingIcon = {
+                    IconButton(onClick = { showEmployeeInfoDialog = true }) {
+                        Icon(Icons.Outlined.Info, contentDescription = "Information zur Berechnung")
+                    }
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            OutlinedTextField(
+                value = financialYear.turnover.toString(),
+                onValueChange = { newValue ->
+                    onUpdate(financialYear.copy(turnover = newValue.filter { it.isDigit() }.toLongOrNull() ?: 0L))
+                },
+                label = { Text("Jahresumsatz") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                visualTransformation = CurrencyVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+                prefix = { Text("€ ") }
+            )
+            OutlinedTextField(
+                value = financialYear.balanceSheetTotal.toString(),
+                onValueChange = { newValue ->
+                    onUpdate(financialYear.copy(balanceSheetTotal = newValue.filter { it.isDigit() }.toLongOrNull() ?: 0L))
+                },
+                label = { Text("Jahresbilanzsumme") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                visualTransformation = CurrencyVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+                prefix = { Text("€ ") }
+            )
         }
     }
 }

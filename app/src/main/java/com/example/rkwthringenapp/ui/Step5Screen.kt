@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 @Composable
 fun Step5Screen(navController: NavController, viewModel: RkwFormViewModel) {
     val formData by viewModel.uiState.collectAsState()
+    val consultantEmailErrors by viewModel.consultantEmailErrors.collectAsState()
     val stepLabels = listOf("Unternehmensdaten", "Ansprechpartner", "Finanzdaten", "Beratung", "Berater", "Abschluss")
 
     Scaffold(
@@ -57,7 +58,7 @@ fun Step5Screen(navController: NavController, viewModel: RkwFormViewModel) {
 
                     formData.consultants.forEachIndexed { index, consultant ->
                         Card(modifier = Modifier.fillMaxWidth()) {
-                            Column(modifier = Modifier.padding(16.dp)) {
+                            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                                     Text("Berater ${index + 1}", style = MaterialTheme.typography.titleMedium)
                                     IconButton(onClick = { viewModel.removeConsultant(index) }) {
@@ -65,12 +66,16 @@ fun Step5Screen(navController: NavController, viewModel: RkwFormViewModel) {
                                     }
                                 }
                                 OutlinedTextField(value = consultant.firstName, onValueChange = { viewModel.updateConsultant(index, consultant.copy(firstName = it)) }, label = { Text("Vorname") }, modifier = Modifier.fillMaxWidth())
-                                Spacer(modifier = Modifier.height(8.dp))
                                 OutlinedTextField(value = consultant.lastName, onValueChange = { viewModel.updateConsultant(index, consultant.copy(lastName = it)) }, label = { Text("Nachname") }, modifier = Modifier.fillMaxWidth())
-                                Spacer(modifier = Modifier.height(8.dp))
                                 OutlinedTextField(value = consultant.accreditationId, onValueChange = { viewModel.updateConsultant(index, consultant.copy(accreditationId = it)) }, label = { Text("Akkreditierungs-Nr.") }, modifier = Modifier.fillMaxWidth())
-                                Spacer(modifier = Modifier.height(8.dp))
-                                OutlinedTextField(value = consultant.email, onValueChange = { viewModel.updateConsultant(index, consultant.copy(email = it)) }, label = { Text("E-Mail") }, modifier = Modifier.fillMaxWidth())
+                                OutlinedTextField(
+                                    value = consultant.email,
+                                    onValueChange = { viewModel.updateConsultant(index, consultant.copy(email = it)) },
+                                    label = { Text("E-Mail") },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    isError = consultantEmailErrors[index] == true,
+                                    supportingText = { if (consultantEmailErrors[index] == true) Text("E-Mail-Adresse ungültig") }
+                                )
                             }
                         }
                     }
@@ -84,7 +89,6 @@ fun Step5Screen(navController: NavController, viewModel: RkwFormViewModel) {
                 }
             }
 
-            // Navigations-Buttons
             Row(
                 modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp, top = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
