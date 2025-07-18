@@ -112,7 +112,6 @@ fun FinancialYearCard(
     var yearDropdownExpanded by remember { mutableStateOf(false) }
     var showEmployeeInfoDialog by remember { mutableStateOf(false) }
 
-    // HIER DER NEUE DIALOG FÜR DIE MITARBEITER-INFO
     if (showEmployeeInfoDialog) {
         AlertDialog(
             onDismissRequest = { showEmployeeInfoDialog = false },
@@ -120,9 +119,9 @@ fun FinancialYearCard(
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text("Die Mitarbeiterzahl wird in Jahresarbeitseinheiten (JAE) ausgedrückt.", fontWeight = FontWeight.Bold)
-                    Text("• Vollzeit-, Teilzeit- und Saisonarbeitskräfte zählen anteilig (z.B. 2 Halbzeitkräfte = 1 JAE).")
-                    Text("• Nicht einbezogen werden: Auszubildende und Personen im Mutterschafts- oder Elternurlaub.")
-                    Divider(modifier = Modifier.padding(vertical = 4.dp))
+                    Text("Einbezogen werden:\n- Lohn- und Gehaltsempfänger\n- für das Unternehmen tätige Personen, die in einem Unterordnungsverhältnis zu diesem stehen und nach nationalem Recht Arbeitnehmern gleichgestellt sind\n- mitarbeitende Eigentümer\n- Teilhaber, die eine regelmäßige Tätigkeit in dem Unternehmen ausüben und finanzielle Vorteile aus dem Unternehmen ziehen.")
+                    Text("Nicht einbezogen werden:\n- Auszubildende oder Studenten in der beruflichen Ausbildung\n- Arbeitnehmer im Mutterschafts- oder Elternurlaub")
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
                     Text("Beispiel:", fontWeight = FontWeight.Bold)
                     Text("1 Vollzeitkraft = 1,0 JAE\n3 Teilzeitkräfte (50%) = 1,5 JAE\n1 Saisonkraft (3 Mon.) = 0,25 JAE\n= Insgesamt 2,75 JAE")
                 }
@@ -167,7 +166,6 @@ fun FinancialYearCard(
                 }
             }
 
-            // HIER DAS NEUE INFO-ICON
             OutlinedTextField(
                 value = if(financialYear.employees == 0) "" else financialYear.employees.toString(),
                 onValueChange = { onUpdate(financialYear.copy(employees = it.toIntOrNull() ?: 0)) },
@@ -182,26 +180,24 @@ fun FinancialYearCard(
             )
 
             OutlinedTextField(
-                value = financialYear.turnover.toString(),
+                value = financialYear.turnover,
                 onValueChange = { newValue ->
-                    onUpdate(financialYear.copy(turnover = newValue.filter { it.isDigit() }.toLongOrNull() ?: 0L))
+                    onUpdate(financialYear.copy(turnover = newValue.filter { it.isDigit() }))
                 },
-                label = { Text("Jahresumsatz") },
+                label = { Text("Jahresumsatz in €") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 visualTransformation = CurrencyVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                prefix = { Text("€ ") }
+                modifier = Modifier.fillMaxWidth()
             )
             OutlinedTextField(
-                value = financialYear.balanceSheetTotal.toString(),
+                value = financialYear.balanceSheetTotal,
                 onValueChange = { newValue ->
-                    onUpdate(financialYear.copy(balanceSheetTotal = newValue.filter { it.isDigit() }.toLongOrNull() ?: 0L))
+                    onUpdate(financialYear.copy(balanceSheetTotal = newValue.filter { it.isDigit() }))
                 },
-                label = { Text("Jahresbilanzsumme") },
+                label = { Text("Jahresbilanzsumme in €") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 visualTransformation = CurrencyVisualTransformation(),
-                modifier = Modifier.fillMaxWidth(),
-                prefix = { Text("€ ") }
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

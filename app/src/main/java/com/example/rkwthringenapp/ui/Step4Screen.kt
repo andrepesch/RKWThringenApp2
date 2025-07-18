@@ -5,20 +5,36 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.rkwthringenapp.ui.util.CurrencyVisualTransformation
+import com.example.rkwthringenapp.ui.util.DateVisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Step4Screen(navController: NavController, viewModel: RkwFormViewModel) {
     val formData by viewModel.uiState.collectAsState()
     val details = formData.consultationDetails
+    val isDailyRateError by viewModel.isDailyRateError.collectAsState()
+    val isEndDateError by viewModel.isEndDateError.collectAsState()
     val stepLabels = listOf("Unternehmensdaten", "Ansprechpartner", "Finanzdaten", "Beratung", "Berater", "Abschluss")
+
+    val focusOptions = listOf(
+        "Unternehmensführung und -organisation",
+        "Marketing und Vertrieb",
+        "Digitalisierung und E-Business",
+        "Personalmanagement und Fachkräftesicherung",
+        "Finanzierung und Controlling",
+        "Nachhaltigkeit und Ressourceneffizienz",
+        "Unternehmensnachfolge"
+    )
+    val scopeOptions = (6..25).map { "$it Tage" }
+
+    var focusDropdownExpanded by remember { mutableStateOf(false) }
+    var scopeDropdownExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = { RkwAppBar() }
@@ -37,54 +53,114 @@ fun Step4Screen(navController: NavController, viewModel: RkwFormViewModel) {
 
             Text("Details zur Beratung", style = MaterialTheme.typography.titleLarge)
 
-            OutlinedTextField(
-                value = details.focus,
-                onValueChange = { viewModel.updateConsultationFocus(it) },
-                label = { Text("Schwerpunkt") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            ExposedDropdownMenuBox(
+                expanded = focusDropdownExpanded,
+                onExpandedChange = { focusDropdownExpanded = !focusDropdownExpanded }
+            ) {
                 OutlinedTextField(
-                    value = if (details.scopeInDays == 0) "" else details.scopeInDays.toString(),
-                    onValueChange = { viewModel.updateConsultationScope(it) },
-                    label = { Text("Umfang (Tage)") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.weight(1f)
+                    value = details.focus.ifEmpty { "Bitte auswählen" },
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Schwerpunkt") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = focusDropdownExpanded) },
+                    modifier = Modifier.menuAnchor().fillMaxWidth()
                 )
+                ExposedDropdownMenu(
+                    expanded = focusDropdownExpanded,
+                    onDismissRequest = { focusDropdownExpanded = false }
+                ) {
+                    focusOptions.forEach { option ->
+                        DropdownMenuItem(
+                            text = { Text(option) },
+                            onClick = {
+                                viewModel.updateConsultationFocus(option)
+                                focusDropdownExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                ExposedDropdownMenuBox(
+                    expanded = scopeDropdownExpanded,
+                    onExpandedChange = { scopeDropdownExpanded = !scopeDropdownExpanded },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    OutlinedTextField(
+                        value = if (details.scopeInDays == 0) "Bitte auswählen" else "${details.scopeInDays} Tage",
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Umfang") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = scopeDropdownExpanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = scopeDropdownExpanded,
+                        onDismissRequest = { scopeDropdownExpanded = false }
+                    ) {
+                        scopeOptions.forEach { option ->
+                            DropdownMenuItem(
+                                text = { Text(option) },
+                                onClick = {
+                                    viewModel.updateConsultationScope(option)
+                                    scopeDropdownExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+
                 OutlinedTextField(
-                    value = if (details.dailyRate == 0.0) "" else details.dailyRate.toString(),
+                    value = details.dailyRate,
                     onValueChange = { viewModel.updateConsultationRate(it) },
                     label = { Text("Tagessatz in €") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.weight(1f)
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    visualTransformation = CurrencyVisualTransformation(),
+                    modifier = Modifier.weight(1f),
+                    isError = isDailyRateError,
+                    supportingText = { if (isDailyRateError) Text("Mind. 600 €") }
                 )
             }
+
             OutlinedTextField(
                 value = details.endDate,
                 onValueChange = { viewModel.updateConsultationEndDate(it) },
-                label = { Text("Zeitraum (bis)") },
-                modifier = Modifier.fillMaxWidth()
+                label = { Text("Zeitraum bis (TTMMJJJJ)") },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = DateVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = isEndDateError,
+                supportingText = { if (isEndDateError) Text("Datum ungültig") }
             )
+
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
             OutlinedTextField(
                 value = details.initialSituation,
                 onValueChange = { viewModel.updateConsultationInitialSituation(it) },
                 label = { Text("Ausgangssituation und Problembeschreibung") },
-                modifier = Modifier.fillMaxWidth().height(120.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
             )
+
             OutlinedTextField(
                 value = details.consultationContent,
                 onValueChange = { viewModel.updateConsultationContent(it) },
                 label = { Text("Beratungsinhalt: Vorgehen, Ziele, Mehrwert") },
-                modifier = Modifier.fillMaxWidth().height(150.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(150.dp)
             )
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(onClick = { navController.popBackStack() }) { Text("Zurück") }
-                // ÄNDERUNG: Navigiert jetzt zu "step5"
                 Button(onClick = { navController.navigate("step5") }) { Text("Weiter") }
             }
         }

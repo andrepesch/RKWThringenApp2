@@ -4,6 +4,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
+import java.text.DecimalFormat
+import java.util.Locale
 
 class CurrencyVisualTransformation : VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
@@ -12,7 +14,8 @@ class CurrencyVisualTransformation : VisualTransformation {
             return TransformedText(AnnotatedString(""), OffsetMapping.Identity)
         }
 
-        val formattedText = originalText.reversed()
+        val formattedText = originalText
+            .reversed()
             .chunked(3)
             .joinToString(".")
             .reversed() + " €"
@@ -24,8 +27,7 @@ class CurrencyVisualTransformation : VisualTransformation {
             }
 
             override fun transformedToOriginal(offset: Int): Int {
-                val dotsInSubstring = text.text.substring(0, offset).count { it == '.' }
-                return offset - dotsInSubstring
+                return text.text.substring(0, offset).count { it.isDigit() }
             }
         }
         return TransformedText(AnnotatedString(formattedText), offsetMapping)

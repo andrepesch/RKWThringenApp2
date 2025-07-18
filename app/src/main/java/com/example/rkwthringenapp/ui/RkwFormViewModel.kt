@@ -33,6 +33,9 @@ class RkwFormViewModel(application: Application) : AndroidViewModel(application)
     private val _hasSavedData = MutableStateFlow(false)
     val hasSavedData: StateFlow<Boolean> = _hasSavedData.asStateFlow()
 
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
     private var fullWzList: List<String> = emptyList()
     val wzList: List<String> get() = fullWzList
 
@@ -57,24 +60,31 @@ class RkwFormViewModel(application: Application) : AndroidViewModel(application)
     private val _isIbanError = MutableStateFlow(false)
     val isIbanError: StateFlow<Boolean> = _isIbanError.asStateFlow()
 
+    private val _isDailyRateError = MutableStateFlow(false)
+    val isDailyRateError: StateFlow<Boolean> = _isDailyRateError.asStateFlow()
+
+    private val _isEndDateError = MutableStateFlow(false)
+    val isEndDateError: StateFlow<Boolean> = _isEndDateError.asStateFlow()
+
     val availableYears: List<String>
 
     init {
         val currentYear = Calendar.getInstance().get(Calendar.YEAR)
         availableYears = (0..3).map { (currentYear - 1 - it).toString() }
 
-        loadWzData()
-        loadData()
+        loadInitialData()
         uiState
             .onEach { saveData() }
             .launchIn(viewModelScope)
     }
 
-    private fun loadWzData() {
+    private fun loadInitialData() {
         viewModelScope.launch(Dispatchers.IO) {
             val inputStream = getApplication<Application>().resources.openRawResource(R.raw.wz2008)
             val reader = BufferedReader(InputStreamReader(inputStream))
             fullWzList = reader.readLines()
+            loadData()
+            _isLoading.value = false
         }
     }
 
@@ -84,16 +94,13 @@ class RkwFormViewModel(application: Application) : AndroidViewModel(application)
         _hasSavedData.value = true
     }
 
-    // HIER FINDET DIE ANPASSUNG STATT
     private fun loadData() {
         val dataAsJson = sharedPreferences.getString("formData", null)
         if (dataAsJson != null) {
             try {
-                // Versuche, die Daten zu laden
                 _uiState.value = gson.fromJson(dataAsJson, RkwFormData::class.java)
                 _hasSavedData.value = true
             } catch (e: JsonSyntaxException) {
-                // Wenn es einen Fehler gibt (alte Daten), starte mit einem leeren Formular
                 Log.e("RkwFormViewModel", "Fehler beim Laden der alten Daten. Setze zurück.", e)
                 startNewForm()
             }
@@ -109,23 +116,17 @@ class RkwFormViewModel(application: Application) : AndroidViewModel(application)
     }
 
     private fun isValidGermanTaxId(taxId: String): Boolean {
-        if (taxId.length != 11 || !taxId.all { it.isDigit() } || taxId.startsWith("0")) {
-            return false
-        }
+        if (taxId.length != 11 || !taxId.all { it.isDigit() } || taxId.startsWith("0")) { return false }
         val digitCounts = taxId.groupingBy { it }.eachCount()
         val hasDouble = digitCounts.values.contains(2)
         val hasTriple = digitCounts.values.contains(3)
         val distinctDigits = digitCounts.keys.size
         val isValidRule1 = hasDouble && !hasTriple && distinctDigits == 9
         val isValidRule2 = hasTriple && !hasDouble && distinctDigits == 8
-        if (!isValidRule1 && !isValidRule2) {
-            return false
-        }
+        if (!isValidRule1 && !isValidRule2) { return false }
         if (hasTriple) {
             for (i in 0..taxId.length - 3) {
-                if (taxId[i] == taxId[i + 1] && taxId[i] == taxId[i + 2]) {
-                    return false
-                }
+                if (taxId[i] == taxId[i + 1] && taxId[i] == taxId[i + 2]) { return false }
             }
         }
         return true
@@ -134,20 +135,10 @@ class RkwFormViewModel(application: Application) : AndroidViewModel(application)
     private fun isValidIban(iban: String): Boolean {
         if (iban.length < 5) return false
         val rearrangedIban = iban.substring(4) + iban.substring(0, 4)
-        val numericIban = rearrangedIban.map { char ->
-            if (char.isLetter()) {
-                (char.code - 'A'.code + 10).toString()
-            } else {
-                char.toString()
-            }
-        }.joinToString("")
-
+        val numericIban = rearrangedIban.map { char -> if (char.isLetter()) (char.code - 'A'.code + 10).toString() else char.toString() }.joinToString("")
         return try {
-            val ibanAsBigInt = BigInteger(numericIban)
-            ibanAsBigInt.mod(BigInteger("97")) == BigInteger.ONE
-        } catch (e: NumberFormatException) {
-            false
-        }
+            BigInteger(numericIban).mod(BigInteger("97")) == BigInteger.ONE
+        } catch (e: NumberFormatException) { false }
     }
 
     fun updateCompanyName(name: String) { _uiState.update { it.copy(companyName = name) } }
@@ -240,9 +231,29 @@ class RkwFormViewModel(application: Application) : AndroidViewModel(application)
         }
     }
     fun updateConsultationFocus(focus: String) { _uiState.update { it.copy(consultationDetails = it.consultationDetails.copy(focus = focus)) } }
-    fun updateConsultationScope(days: String) { _uiState.update { it.copy(consultationDetails = it.consultationDetails.copy(scopeInDays = days.toIntOrNull() ?: 0)) } }
-    fun updateConsultationRate(rate: String) { _uiState.update { it.copy(consultationDetails = it.consultationDetails.copy(dailyRate = rate.toDoubleOrNull() ?: 0.0)) } }
-    fun updateConsultationEndDate(date: String) { _uiState.update { it.copy(consultationDetails = it.consultationDetails.copy(endDate = date)) } }
+    fun updateConsultationScope(scope: String) {
+        val days = scope.filter { it.isDigit() }.toIntOrNull() ?: 0
+        _uiState.update { it.copy(consultationDetails = it.consultationDetails.copy(scopeInDays = days)) }
+    }
+    fun updateConsultationRate(rate: String) {
+        val rateDigits = rate.filter { it.isDigit() }
+        val rateValue = rateDigits.toLongOrNull() ?: 0L
+        _isDailyRateError.value = rateValue > 0 && rateValue < 600
+        _uiState.update { it.copy(consultationDetails = it.consultationDetails.copy(dailyRate = rateDigits)) }
+    }
+    fun updateConsultationEndDate(date: String) {
+        val digitsOnly = date.filter { it.isDigit() }
+        if (digitsOnly.length <= 8) {
+            _uiState.update { it.copy(consultationDetails = it.consultationDetails.copy(endDate = digitsOnly)) }
+            if (digitsOnly.length == 8) {
+                try {
+                    val formatter = DateTimeFormatter.ofPattern("ddMMyyyy")
+                    val parsedDate = LocalDate.parse(digitsOnly, formatter)
+                    _isEndDateError.value = parsedDate.isBefore(LocalDate.now())
+                } catch (e: DateTimeParseException) { _isEndDateError.value = true }
+            } else { _isEndDateError.value = false }
+        }
+    }
     fun updateConsultationInitialSituation(text: String) { _uiState.update { it.copy(consultationDetails = it.consultationDetails.copy(initialSituation = text)) } }
     fun updateConsultationContent(text: String) { _uiState.update { it.copy(consultationDetails = it.consultationDetails.copy(consultationContent = text)) } }
     fun updateHasChosenConsultant(hasChosen: Boolean) { _uiState.update { it.copy(hasChosenConsultant = hasChosen) } }

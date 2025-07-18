@@ -15,13 +15,13 @@ data class RkwFormData(
     val beneficialOwners: List<BeneficialOwner> = emptyList(),
     val bankDetails: BankDetails = BankDetails(institute = "", iban = "", taxId = ""),
     val smeClassification: SmeClassification = SmeClassification(
-        lastYear = FinancialYear(year = "", employees = 0, turnover = 0L, balanceSheetTotal = 0L),
-        penultimateYear = FinancialYear(year = "", employees = 0, turnover = 0L, balanceSheetTotal = 0L)
+        lastYear = FinancialYear(year = "", employees = 0, turnover = "", balanceSheetTotal = ""),
+        penultimateYear = FinancialYear(year = "", employees = 0, turnover = "", balanceSheetTotal = "")
     ),
     val consultationDetails: ConsultationDetails = ConsultationDetails(
         focus = "",
         scopeInDays = 0,
-        dailyRate = 0.0,
+        dailyRate = "",
         endDate = "",
         initialSituation = "",
         consultationContent = ""
@@ -36,7 +36,7 @@ data class RkwFormData(
 data class ContactPerson(val name: String, val email: String, val phone: String)
 data class BeneficialOwner(val lastName: String, val firstName: String, val birthDate: String = "", val taxId: String = "")
 data class BankDetails(val institute: String, val iban: String, val taxId: String)
-data class FinancialYear(val year: String = "", val employees: Int, val turnover: Long, val balanceSheetTotal: Long)
+data class FinancialYear(val year: String = "", val employees: Int, val turnover: String, val balanceSheetTotal: String)
 data class SmeClassification(val lastYear: FinancialYear, val penultimateYear: FinancialYear)
-data class ConsultationDetails(val focus: String, val scopeInDays: Int, val dailyRate: Double, val endDate: String, val initialSituation: String, val consultationContent: String)
+data class ConsultationDetails(val focus: String, val scopeInDays: Int, val dailyRate: String, val endDate: String, val initialSituation: String, val consultationContent: String)
 data class Consultant(val firstName: String, val lastName: String, val accreditationId: String = "", val email: String)
