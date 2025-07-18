@@ -236,10 +236,9 @@ class RkwFormViewModel(application: Application) : AndroidViewModel(application)
         _uiState.update { it.copy(consultationDetails = it.consultationDetails.copy(scopeInDays = days)) }
     }
     fun updateConsultationRate(rate: String) {
-        val rateDigits = rate.filter { it.isDigit() }
-        val rateValue = rateDigits.toLongOrNull() ?: 0L
-        _isDailyRateError.value = rateValue > 0 && rateValue < 600
-        _uiState.update { it.copy(consultationDetails = it.consultationDetails.copy(dailyRate = rateDigits)) }
+        val rateValue = rate.filter { it.isDigit() }
+        _isDailyRateError.value = (rateValue.toLongOrNull() ?: 0L) < 600 && rateValue.isNotEmpty()
+        _uiState.update { it.copy(consultationDetails = it.consultationDetails.copy(dailyRate = rateValue)) }
     }
     fun updateConsultationEndDate(date: String) {
         val digitsOnly = date.filter { it.isDigit() }

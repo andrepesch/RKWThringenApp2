@@ -3,13 +3,12 @@ package com.example.rkwthringenapp.ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -39,12 +38,45 @@ fun Step5Screen(navController: NavController, viewModel: RkwFormViewModel) {
 
             Text("Beraterauswahl", style = MaterialTheme.typography.titleLarge)
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    checked = formData.hasChosenConsultant,
-                    onCheckedChange = { viewModel.updateHasChosenConsultant(it) }
-                )
-                Text("Ich habe mich bereits für einen Berater entschieden.")
+            Column {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = !formData.hasChosenConsultant,
+                            onClick = { viewModel.updateHasChosenConsultant(false) }
+                        )
+                        .padding(vertical = 4.dp)
+                ) {
+                    RadioButton(
+                        selected = !formData.hasChosenConsultant,
+                        onClick = { viewModel.updateHasChosenConsultant(false) }
+                    )
+                    Text(
+                        text = "Ich wünsche eine Empfehlung für ein Beratungsunternehmen vom RKW Thüringen.",
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .selectable(
+                            selected = formData.hasChosenConsultant,
+                            onClick = { viewModel.updateHasChosenConsultant(true) }
+                        )
+                        .padding(vertical = 4.dp)
+                ) {
+                    RadioButton(
+                        selected = formData.hasChosenConsultant,
+                        onClick = { viewModel.updateHasChosenConsultant(true) }
+                    )
+                    Text(
+                        text = "Ich habe mich bereits für ein Beratungsunternehmen entschieden.",
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
             }
 
             AnimatedVisibility(visible = formData.hasChosenConsultant) {
@@ -60,7 +92,8 @@ fun Step5Screen(navController: NavController, viewModel: RkwFormViewModel) {
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                    Text("Berater ${index + 1}", style = MaterialTheme.typography.titleMedium)
+                                    // HIER DIE ÄNDERUNG DES WORDINGS
+                                    Text("Berater/in ${index + 1}", style = MaterialTheme.typography.titleMedium)
                                     IconButton(onClick = { viewModel.removeConsultant(index) }) {
                                         Icon(Icons.Default.Delete, contentDescription = "Berater entfernen")
                                     }
@@ -80,11 +113,14 @@ fun Step5Screen(navController: NavController, viewModel: RkwFormViewModel) {
                         }
                     }
 
-                    Button(
-                        onClick = { viewModel.addConsultant() },
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("+ Weiteren Berater hinzufügen")
+                    // HIER DIE ÄNDERUNG: Button wird nur angezeigt, wenn weniger als 2 Berater da sind
+                    if (formData.consultants.size < 2) {
+                        Button(
+                            onClick = { viewModel.addConsultant() },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text("Weitere/n Berater/in hinzufügen")
+                        }
                     }
                 }
             }

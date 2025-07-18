@@ -1,6 +1,9 @@
 package com.example.rkwthringenapp.ui
 
+import android.app.Activity
+import android.content.Intent
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
@@ -14,7 +17,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
@@ -34,20 +36,20 @@ fun Step6Screen(
     var tempImageUri by remember { mutableStateOf<Uri?>(null) }
     val stepLabels = listOf("Unternehmensdaten", "Ansprechpartner", "Finanzdaten", "Beratung", "Berater", "Abschluss")
 
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? -> uri?.let { viewModel.addDocument(it) } }
-    )
+    val universalLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val selectedUri: Uri? = result.data?.data
+            if (selectedUri != null) {
+                viewModel.addDocument(selectedUri)
+            } else {
+                tempImageUri?.let { viewModel.addDocument(it) }
+            }
+        }
+    }
 
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = { success -> if (success) { tempImageUri?.let { viewModel.addDocument(it) } } }
-    )
-
-    // HINWEIS: Die Seite wird jetzt auch von einem Scaffold umschlossen
-    Scaffold(
-        topBar = { RkwAppBar() }
-    ) { paddingValues ->
+    Scaffold(topBar = { RkwAppBar() }) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -57,26 +59,38 @@ fun Step6Screen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
-            // HINWEIS: Der ProgressStepper wurde hinzugefügt
             ProgressStepper(currentStep = 6, stepLabels = stepLabels)
             Spacer(modifier = Modifier.height(8.dp))
 
             Text("Dokumente & Versand", style = MaterialTheme.typography.titleLarge)
-            Text(
-                "Bitte fügen Sie je nach Unternehmensform benötigte Dokumente hinzu (z.B. Gewerbeanmeldung, Gesellschaftsvertrag etc.).",
-                style = MaterialTheme.typography.bodySmall
-            )
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(onClick = {
+            InfoBox(text = "Bitte fügen Sie je nach Unternehmensform benötigte Dokumente hinzu (z.B. Gewerbeanmeldung, Gesellschaftsvertrag etc.).")
+
+            Button(
+                onClick = {
+                    val galleryIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                        type = "*/*"
+                        putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*", "application/pdf"))
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                    }
+
                     val tempFile = File.createTempFile("temp_image_", ".jpg", context.cacheDir)
                     val uri = FileProvider.getUriForFile(
                         Objects.requireNonNull(context),
                         context.packageName + ".provider", tempFile
                     )
                     tempImageUri = uri
-                    cameraLauncher.launch(uri)
-                }) { Text("📷 Kamera") }
-                Button(onClick = { filePickerLauncher.launch("*/*") }) { Text("📂 Dateien") }
+                    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
+                        putExtra(MediaStore.EXTRA_OUTPUT, uri)
+                    }
+
+                    val chooserIntent = Intent.createChooser(galleryIntent, "Dokument auswählen")
+                    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent))
+
+                    universalLauncher.launch(chooserIntent)
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Dokument hochladen")
             }
 
             Text("Angehängte Dokumente:", style = MaterialTheme.typography.titleMedium)
@@ -89,7 +103,7 @@ fun Step6Screen(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(Uri.parse(uriString).path?.substringAfterLast('/') ?: "Unbekannte Datei", modifier = Modifier.weight(1f))
+                        Text(Uri.parse(uriString).path?.substringAfterLast(':')?.substringAfterLast('/') ?: "Unbekannte Datei", modifier = Modifier.weight(1f))
                         IconButton(onClick = { viewModel.removeDocument(uriString) }) {
                             Icon(Icons.Default.Delete, contentDescription = "Dokument entfernen")
                         }
@@ -111,7 +125,9 @@ fun Step6Screen(
             }
 
             Row(
-                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Button(onClick = { navController.popBackStack() }) { Text("Zurück") }
@@ -121,6 +137,7 @@ fun Step6Screen(
     }
 }
 
+// DIESE FUNKTION HATTE GEFEHLT
 @Composable
 fun SummaryView(formData: RkwFormData) {
     Column(
@@ -133,6 +150,5 @@ fun SummaryView(formData: RkwFormData) {
         Text("Firma: ${formData.companyName}, ${formData.legalForm}")
         Text("Ansprechpartner: ${formData.mainContact.name}")
         Text("E-Mail: ${formData.mainContact.email}")
-        // Fügen Sie hier bei Bedarf weitere Felder aus der Zusammenfassung hinzu
     }
 }
