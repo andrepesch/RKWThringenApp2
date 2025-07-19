@@ -1,9 +1,9 @@
 package com.example.rkwthringenapp.ui
 
+import android.Manifest
 import android.app.Activity
-import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
-import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
@@ -12,12 +12,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import com.example.rkwthringenapp.data.RkwFormData
@@ -35,18 +38,87 @@ fun Step6Screen(
     val context = LocalContext.current
     var tempImageUri by remember { mutableStateOf<Uri?>(null) }
     val stepLabels = listOf("Unternehmensdaten", "Ansprechpartner", "Finanzdaten", "Beratung", "Berater", "Abschluss")
+    var showPublicationInfoDialog by remember { mutableStateOf(false) }
 
-    val universalLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            val selectedUri: Uri? = result.data?.data
-            if (selectedUri != null) {
-                viewModel.addDocument(selectedUri)
-            } else {
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture(),
+        onResult = { success ->
+            if (success) {
                 tempImageUri?.let { viewModel.addDocument(it) }
             }
         }
+    )
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+        onResult = { uri: Uri? ->
+            uri?.let { viewModel.addDocument(it) }
+        }
+    )
+
+    fun launchCamera() {
+        val tempFile = File.createTempFile("temp_image_", ".jpg", context.cacheDir)
+        val uri = FileProvider.getUriForFile(
+            Objects.requireNonNull(context),
+            context.packageName + ".provider", tempFile
+        )
+        tempImageUri = uri
+        cameraLauncher.launch(uri)
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            launchCamera()
+        }
+    }
+
+    if (showPublicationInfoDialog) {
+        AlertDialog(
+            onDismissRequest = { showPublicationInfoDialog = false },
+            title = { Text("Publizitätspflichten") },
+            text = {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    Text(
+                        text = "Einzuhaltende Publizitätspflichten im Rahmen der Thüringer Beratungsrichtlinie",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Text(
+                        text = "Grundlage der Publizitätspflicht",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Zur Erfüllung und Einhaltung der Publizitätspflicht sind alle Antragstellenden gemäß Artikel 47 und Artikel 50 Abs. 1 i.V.m. Anhang IX der Verordnung (EU) 2021/1060 verpflichtet. Während der Durchführung eines ESF Plus geförderten Vorhaben ist über die Förderung aus dem ESF Plus zu informieren und in der Öffentlichkeitsarbeit sichtbar zu machen.",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Text(
+                        text = "Anbringen einen A3 Plakates",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Ein Plakat im Format A3 ist an einer für die Öffentlichkeit deutlich sichtbaren Stelle in den Räumlichkeiten des Zuwendungsempfängers anzubringen. Das Plakat im A3-Format zu Ihrem Vorhaben erhalten Sie von der Thüringer Aufbaubank mit dem Zuwendungsbescheid.\nDas Plakat beinhaltet allgemeinen Informationen zur Förderung, allerdings keine detaillierten Beratungsinhalte oder sonstige Rückschlüsse auf den individuellen Beratungsgegenstand.",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                    Text(
+                        text = "Veröffentlichung auf der Webseite",
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Eine kurze Beschreibung des Vorhabens ist ebenfalls auf der Webseite/ Social Media Site des Zuwendungsempfängers (soweit vorhanden) zu veröffentlichen. Die Beschreibung muss auf die Ziele und Ergebnisse des Vorhabens eingehen sowie die finanzielle Unterstützung aus dem ESF Plus und durch das Land Thüringen hervorheben. Darüber hinaus sind neben dem zwingend darzustellenden EU-Logo das Logo des Thüringer Ministeriums für Wirtschaft, Wissenschaft und Digitale Gesellschaft darzustellen. Gleichzeitig ist darauf zu achten, dass das Logo direkt nach Aufrufen der Webseite sichtbar ist ohne dass ein Scrollen nach unten nötig ist.",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = { showPublicationInfoDialog = false }) {
+                    Text("Schließen")
+                }
+            }
+        )
     }
 
     Scaffold(topBar = { RkwAppBar() }) { paddingValues ->
@@ -63,34 +135,65 @@ fun Step6Screen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text("Dokumente & Versand", style = MaterialTheme.typography.titleLarge)
-            InfoBox(text = "Bitte fügen Sie je nach Unternehmensform benötigte Dokumente hinzu (z.B. Gewerbeanmeldung, Gesellschaftsvertrag etc.).")
 
-            Button(
-                onClick = {
-                    val galleryIntent = Intent(Intent.ACTION_GET_CONTENT).apply {
-                        type = "*/*"
-                        putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("image/*", "application/pdf"))
-                        addCategory(Intent.CATEGORY_OPENABLE)
+            val requiredDocs = when (formData.legalForm) {
+                "Einzelunternehmen", "GbR" -> listOf("Gewerbeanmeldung / -ummeldung", "Gesellschaftsvertrag (bei GbR)")
+                "e.K.", "Kommanditgesellschaft (KG)", "Offene Handelsgesellschaft (OHG)" -> listOf("Gewerbeanmeldung / -ummeldung")
+                "Freie Berufe" -> listOf("Nachweis der Tätigkeit (z.B. Zulassung, Steuernummer)")
+                "e. V." -> listOf("Nachweis der wirtschaftlichen Tätigkeit (Gewerbeanmeldung o.Ä.)")
+                "GmbH", "GmbH & Co. KG", "UG (haftungsbeschränkt)", "Aktiengesellschaft (AG)", "Limited (Ltd.)", "Ltd. & Co. KG", "Eingetragene Genossenschaft (eG)", "KG auf Aktien (KGaA)", "Partnerschaftsgesellschaft", "Societas Europaea (SE)", "Stiftung" -> listOf("Gesellschaftsvertrag", "Handelsregisterauszug")
+                else -> emptyList()
+            }
+            var documentsWillBeSentLater by remember { mutableStateOf(false) }
+
+            if (requiredDocs.isNotEmpty()) {
+                Text("Benötigte Anlagen für Ihre Rechtsform:", style = MaterialTheme.typography.titleMedium)
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        requiredDocs.forEach { doc ->
+                            Text("• $doc", style = MaterialTheme.typography.bodyMedium)
+                        }
                     }
+                }
+            }
 
-                    val tempFile = File.createTempFile("temp_image_", ".jpg", context.cacheDir)
-                    val uri = FileProvider.getUriForFile(
-                        Objects.requireNonNull(context),
-                        context.packageName + ".provider", tempFile
-                    )
-                    tempImageUri = uri
-                    val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
-                        putExtra(MediaStore.EXTRA_OUTPUT, uri)
-                    }
-
-                    val chooserIntent = Intent.createChooser(galleryIntent, "Dokument auswählen")
-                    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent))
-
-                    universalLauncher.launch(chooserIntent)
-                },
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text("Dokument hochladen")
+                Button(
+                    onClick = {
+                        filePickerLauncher.launch("application/pdf, image/*")
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Dokument auswählen")
+                }
+                Button(
+                    onClick = {
+                        when (PackageManager.PERMISSION_GRANTED) {
+                            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> {
+                                launchCamera()
+                            }
+                            else -> {
+                                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                            }
+                        }
+                    },
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Dokument fotografieren")
+                }
+            }
+
+            if (requiredDocs.isNotEmpty()) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Checkbox(
+                        checked = documentsWillBeSentLater,
+                        onCheckedChange = { documentsWillBeSentLater = it }
+                    )
+                    Text("Benötigte Anlagen werden später nachgereicht", style = MaterialTheme.typography.bodySmall)
+                }
             }
 
             Text("Angehängte Dokumente:", style = MaterialTheme.typography.titleMedium)
@@ -122,6 +225,9 @@ fun Step6Screen(
                     onCheckedChange = { viewModel.updateAcknowledgement(it) }
                 )
                 Text("Ich habe die Publizitätsverpflichtungen zur Kenntnis genommen.", style = MaterialTheme.typography.bodySmall, lineHeight = MaterialTheme.typography.bodySmall.fontSize * 1.2)
+                IconButton(onClick = { showPublicationInfoDialog = true }) {
+                    Icon(Icons.Outlined.Info, contentDescription = "Information anzeigen")
+                }
             }
 
             Row(
@@ -137,7 +243,6 @@ fun Step6Screen(
     }
 }
 
-// DIESE FUNKTION HATTE GEFEHLT
 @Composable
 fun SummaryView(formData: RkwFormData) {
     Column(

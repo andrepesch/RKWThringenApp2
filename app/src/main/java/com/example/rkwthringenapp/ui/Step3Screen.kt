@@ -45,7 +45,9 @@ fun Step3Screen(navController: NavController, viewModel: RkwFormViewModel) {
             ProgressStepper(currentStep = 3, stepLabels = stepLabels)
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text("Bankverbindung & Steuern", style = MaterialTheme.typography.titleLarge)
+            // HIER DIE ÄNDERUNG: Neuer Titel für die gesamte Seite
+            Text("Bankverbindung, Steuernr. und KMU-Bewertung", style = MaterialTheme.typography.titleLarge)
+
             OutlinedTextField(value = formData.bankDetails.institute, onValueChange = { viewModel.updateBankInstitute(it) }, label = { Text("Kreditinstitut") }, modifier = Modifier.fillMaxWidth())
             OutlinedTextField(
                 value = formData.bankDetails.iban,
@@ -61,7 +63,7 @@ fun Step3Screen(navController: NavController, viewModel: RkwFormViewModel) {
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            Text("KMU-Einstufung", style = MaterialTheme.typography.titleLarge)
+            // Die separate Überschrift wurde entfernt und durch die InfoBox ersetzt
             InfoBox(text = "Die Einstufung als kleines oder mittleres Unternehmen (KMU) ist Voraussetzung für den Zugang zu vielen Förderprogrammen. Die Angaben der letzten beiden abgeschlossenen Geschäftsjahre sind dafür entscheidend.")
 
             Button(onClick = { lastYearVisible = !lastYearVisible }, modifier = Modifier.fillMaxWidth()) {
@@ -185,9 +187,7 @@ fun FinancialYearCard(
                     onUpdate(financialYear.copy(turnover = newValue.filter { it.isDigit() }))
                 },
                 label = { Text("Jahresumsatz in €") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                visualTransformation = CurrencyVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
             OutlinedTextField(
                 value = financialYear.balanceSheetTotal,
@@ -195,9 +195,7 @@ fun FinancialYearCard(
                     onUpdate(financialYear.copy(balanceSheetTotal = newValue.filter { it.isDigit() }))
                 },
                 label = { Text("Jahresbilanzsumme in €") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                visualTransformation = CurrencyVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
         }
     }

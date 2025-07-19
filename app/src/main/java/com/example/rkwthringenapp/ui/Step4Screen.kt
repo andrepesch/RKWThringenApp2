@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.rkwthringenapp.ui.util.CurrencyVisualTransformation
 import com.example.rkwthringenapp.ui.util.DateVisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,13 +22,21 @@ fun Step4Screen(navController: NavController, viewModel: RkwFormViewModel) {
     val stepLabels = listOf("Unternehmensdaten", "Ansprechpartner", "Finanzdaten", "Beratung", "Berater", "Abschluss")
 
     val focusOptions = listOf(
-        "Unternehmensführung und -organisation",
-        "Marketing und Vertrieb",
-        "Digitalisierung und E-Business",
-        "Personalmanagement und Fachkräftesicherung",
-        "Finanzierung und Controlling",
-        "Nachhaltigkeit und Ressourceneffizienz",
-        "Unternehmensnachfolge"
+        "Strategie und Geschäftsideen",
+        "Finanzierung und Investitionen",
+        "Unternehmenswachstum und Wettbewerbsfähigkeit",
+        "Internationalisierung",
+        "Rationalisierungsmaßnahmen und Kostensenkungen, Technologietransfer und Technologieanwendung",
+        "Personalmanagement/ Organisationsentwicklung",
+        "Produktportfolio, Marktanalysen und Marketing",
+        "Innovationsmanagement",
+        "Materialeffizienz",
+        "Unternehmensnachfolge",
+        "Kooperation von Unternehmen",
+        "Nachhaltigkeit und Anpassung an den Klimawandel",
+        "Prozessbegleitung",
+        "Qualitätsmanagement",
+        "Digitalisierung"
     )
     val scopeOptions = (6..25).map { "$it Tage" }
 
@@ -116,7 +123,6 @@ fun Step4Screen(navController: NavController, viewModel: RkwFormViewModel) {
                     onValueChange = { viewModel.updateConsultationRate(it) },
                     label = { Text("Tagessatz in €") },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    visualTransformation = CurrencyVisualTransformation(),
                     modifier = Modifier.weight(1f),
                     isError = isDailyRateError,
                     supportingText = { if (isDailyRateError) Text("Mind. 600 €") }
