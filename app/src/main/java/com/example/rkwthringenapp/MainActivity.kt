@@ -1,26 +1,39 @@
 package com.example.rkwthringenapp
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.rkwthringenapp.data.RkwFormData
 import com.example.rkwthringenapp.ui.AppNavigation
 import com.example.rkwthringenapp.ui.RkwFormViewModel
 import com.example.rkwthringenapp.ui.theme.RKWThüringenAppTheme
-import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.kernel.pdf.PdfWriter
-import com.itextpdf.layout.Document
-import com.itextpdf.layout.element.Paragraph
-import java.io.File
+import io.ktor.client.*
+import io.ktor.client.engine.cio.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.coroutines.launch
+import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity() {
 
     private val viewModel: RkwFormViewModel by viewModels()
+
+    // Erstellen des Ktor HTTP-Clients, der für alle Anfragen wiederverwendet wird.
+    private val client = HttpClient(CIO) {
+        install(ContentNegotiation) {
+            json(Json {
+                prettyPrint = true
+                isLenient = true
+                ignoreUnknownKeys = true // Wichtig, damit die App nicht abstürzt, wenn der Server unbekannte Felder sendet.
+            })
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,46 +41,47 @@ class MainActivity : ComponentActivity() {
             RKWThüringenAppTheme {
                 AppNavigation(
                     viewModel = viewModel,
-                    onSendClick = { createAndSendEmail(viewModel.uiState.value) }
+                    onSendClick = {
+                        // Starte eine Coroutine im LifecycleScope der Activity.
+                        // Das sorgt dafür, dass die Anfrage sauber abgebrochen wird, wenn die App geschlossen wird.
+                        lifecycleScope.launch {
+                            sendDataToServer(viewModel.uiState.value)
+                        }
+                    }
                 )
             }
         }
     }
 
-    private fun createAndSendEmail(formData: RkwFormData) {
-        val pdfFile = File(cacheDir, "erfassungsbogen.pdf").also { file ->
-            val writer = PdfWriter(file)
-            val pdf = PdfDocument(writer)
-            val document = Document(pdf)
-            document.add(Paragraph("Erfassungsbogen für: ${formData.companyName}"))
-            document.add(Paragraph("Ansprechpartner: ${formData.mainContact.name}"))
-            document.add(Paragraph("E-Mail: ${formData.mainContact.email}"))
-            document.close()
-        }
+    private suspend fun sendDataToServer(formData: RkwFormData) {
+        // Die URL zu deinem PHP-Skript
+        val url = "https://formpilot.eu/process_form.php"
 
-        val pdfUri: Uri = FileProvider.getUriForFile(this, "$packageName.provider", pdfFile)
-
-        // ÄNDERUNG: Wir wandeln die gespeicherten Strings zurück in Uris um
-        val attachmentUris = ArrayList<Uri>().apply {
-            add(pdfUri)
-            formData.attachedDocuments.forEach { uriString ->
-                add(Uri.parse(uriString))
+        try {
+            // Führe eine POST-Anfrage aus
+            val response: HttpResponse = client.post(url) {
+                // Setze den Content-Type auf application/json
+                contentType(ContentType.Application.Json)
+                // Hänge das serialisierte formData-Objekt als Body an die Anfrage an
+                setBody(formData)
             }
-        }
 
-        val emailIntent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
-            type = "*/*"
-            putExtra(Intent.EXTRA_EMAIL, arrayOf("pesch@rkw-thueringen.de"))
-            putExtra(Intent.EXTRA_CC, arrayOf(formData.mainContact.email))
-            putExtra(Intent.EXTRA_SUBJECT, "Neue Beratungsanfrage: ${formData.companyName}")
-            putParcelableArrayListExtra(Intent.EXTRA_STREAM, attachmentUris)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
+            // Werte die Antwort des Servers aus
+            if (response.status == HttpStatusCode.OK) {
+                // Zeige eine Erfolgsmeldung an
+                Toast.makeText(this@MainActivity, "Anfrage erfolgreich versendet!", Toast.LENGTH_LONG).show()
+                // Optional: Formular nach erfolgreichem Versand zurücksetzen
+                viewModel.startNewForm()
+            } else {
+                // Zeige eine Fehlermeldung mit Details vom Server an
+                val errorBody = response.bodyAsText()
+                Toast.makeText(this@MainActivity, "Fehler vom Server: ${response.status.description}\n$errorBody", Toast.LENGTH_LONG).show()
+            }
 
-        if (emailIntent.resolveActivity(packageManager) != null) {
-            startActivity(emailIntent)
-        } else {
-            Toast.makeText(this, "Keine E-Mail-App gefunden.", Toast.LENGTH_SHORT).show()
+        } catch (e: Exception) {
+            // Fange generelle Netzwerkfehler ab (z.B. keine Internetverbindung)
+            Toast.makeText(this@MainActivity, "Senden fehlgeschlagen: ${e.message}", Toast.LENGTH_LONG).show()
+            e.printStackTrace()
         }
     }
 }

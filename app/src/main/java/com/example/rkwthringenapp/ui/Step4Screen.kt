@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.rkwthringenapp.ui.util.CurrencyVisualTransformation
 import com.example.rkwthringenapp.ui.util.DateVisualTransformation
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -118,12 +119,14 @@ fun Step4Screen(navController: NavController, viewModel: RkwFormViewModel) {
                     }
                 }
 
+                // **HIER IST DIE ÄNDERUNG: CurrencyVisualTransformation angewendet**
                 OutlinedTextField(
                     value = details.dailyRate,
                     onValueChange = { viewModel.updateConsultationRate(it) },
                     label = { Text("Tagessatz in €") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.weight(1f),
+                    visualTransformation = CurrencyVisualTransformation(), // Formatierung angewendet
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = isDailyRateError,
                     supportingText = { if (isDailyRateError) Text("Mind. 600 €") }
                 )

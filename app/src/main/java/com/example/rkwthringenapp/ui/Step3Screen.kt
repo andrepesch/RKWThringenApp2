@@ -45,7 +45,6 @@ fun Step3Screen(navController: NavController, viewModel: RkwFormViewModel) {
             ProgressStepper(currentStep = 3, stepLabels = stepLabels)
             Spacer(modifier = Modifier.height(8.dp))
 
-            // HIER DIE ÄNDERUNG: Neuer Titel für die gesamte Seite
             Text("Bankverbindung, Steuernr. und KMU-Bewertung", style = MaterialTheme.typography.titleLarge)
 
             OutlinedTextField(value = formData.bankDetails.institute, onValueChange = { viewModel.updateBankInstitute(it) }, label = { Text("Kreditinstitut") }, modifier = Modifier.fillMaxWidth())
@@ -63,7 +62,6 @@ fun Step3Screen(navController: NavController, viewModel: RkwFormViewModel) {
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-            // Die separate Überschrift wurde entfernt und durch die InfoBox ersetzt
             InfoBox(text = "Die Einstufung als kleines oder mittleres Unternehmen (KMU) ist Voraussetzung für den Zugang zu vielen Förderprogrammen. Die Angaben der letzten beiden abgeschlossenen Geschäftsjahre sind dafür entscheidend.")
 
             Button(onClick = { lastYearVisible = !lastYearVisible }, modifier = Modifier.fillMaxWidth()) {
@@ -181,20 +179,30 @@ fun FinancialYearCard(
                 modifier = Modifier.fillMaxWidth()
             )
 
+            // **KORRIGIERTES FELD FÜR JAHRESUMSATZ**
             OutlinedTextField(
                 value = financialYear.turnover,
                 onValueChange = { newValue ->
-                    onUpdate(financialYear.copy(turnover = newValue.filter { it.isDigit() }))
+                    // Diese Zeile ist der Schlüssel: Sie entfernt alle Nicht-Ziffern,
+                    // bevor die Daten im ViewModel gespeichert werden.
+                    val digitsOnly = newValue.filter { it.isDigit() }
+                    onUpdate(financialYear.copy(turnover = digitsOnly))
                 },
                 label = { Text("Jahresumsatz in €") },
+                visualTransformation = CurrencyVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
+
+            // **KORRIGIERTES FELD FÜR JAHRESBILANZSUMME**
             OutlinedTextField(
                 value = financialYear.balanceSheetTotal,
                 onValueChange = { newValue ->
-                    onUpdate(financialYear.copy(balanceSheetTotal = newValue.filter { it.isDigit() }))
+                    // Auch hier werden nur die reinen Ziffern gespeichert.
+                    val digitsOnly = newValue.filter { it.isDigit() }
+                    onUpdate(financialYear.copy(balanceSheetTotal = digitsOnly))
                 },
                 label = { Text("Jahresbilanzsumme in €") },
+                visualTransformation = CurrencyVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
         }
