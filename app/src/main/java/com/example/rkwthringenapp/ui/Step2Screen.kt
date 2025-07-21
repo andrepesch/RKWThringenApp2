@@ -17,7 +17,6 @@ import androidx.navigation.NavController
 import com.example.rkwthringenapp.ui.util.DateVisualTransformation
 import com.example.rkwthringenapp.ui.util.TaxIdVisualTransformation
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Step2Screen(navController: NavController, viewModel: RkwFormViewModel) {
     val formData by viewModel.uiState.collectAsState()
@@ -34,7 +33,7 @@ fun Step2Screen(navController: NavController, viewModel: RkwFormViewModel) {
     )
     val showBeneficialOwners = formData.legalForm in legalFormsRequiringBeneficialOwners
 
-    Scaffold(topBar = { RkwAppBar() }) { paddingValues ->
+    Scaffold(topBar = { RkwAppBar(title = "Erfassungsbogen") }) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()

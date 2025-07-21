@@ -1,7 +1,6 @@
 package com.example.rkwthringenapp.ui
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,35 +15,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import com.example.rkwthringenapp.R
 import com.example.rkwthringenapp.ui.util.DateVisualTransformation
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun RkwAppBar() {
-    TopAppBar(
-        title = { Text("Erfassungsbogen", fontWeight = FontWeight.Bold) },
-        actions = {
-            Image(
-                painter = painterResource(id = R.drawable.rkw_thueringen_wuerfel_grau),
-                contentDescription = "RKW Logo",
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .size(32.dp)
-            )
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background,
-            titleContentColor = MaterialTheme.colorScheme.onBackground
-        )
-    )
-}
+// HINWEIS: Die alte RkwAppBar-Funktion wurde von hier entfernt und in CommonUI.kt zentralisiert.
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,7 +33,7 @@ fun Step1Screen(navController: NavController, viewModel: RkwFormViewModel) {
     val legalForms = listOf("Einzelunternehmen", "GbR", "e.K.", "GmbH", "GmbH & Co. KG", "UG (haftungsbeschränkt)", "Freie Berufe", "Kommanditgesellschaft (KG)", "Offene Handelsgesellschaft (OHG)", "Aktiengesellschaft (AG)", "Limited (Ltd.)", "Ltd. & Co. KG", "e. V.", "Eingetragene Genossenschaft (eG)", "KG auf Aktien (KGaA)", "Partnerschaftsgesellschaft", "Societas Europaea (SE)", "Stiftung")
     val stepLabels = listOf("Unternehmensdaten", "Ansprechpartner", "Finanzdaten", "Beratung", "Berater", "Abschluss")
 
-    var showWzSearchDialog by remember { mutableStateOf(false) }
+    var showWzSearchDialog by remember { mutableStateOf(false) } // KORRIGIERT: mutableState -> mutableStateOf
 
     if (showWzSearchDialog) {
         WzSearchDialog(
@@ -69,7 +46,7 @@ fun Step1Screen(navController: NavController, viewModel: RkwFormViewModel) {
         )
     }
 
-    Scaffold(topBar = { RkwAppBar() }) { paddingValues ->
+    Scaffold(topBar = { RkwAppBar(title = "Erfassungsbogen") }) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -105,7 +82,7 @@ fun Step1Screen(navController: NavController, viewModel: RkwFormViewModel) {
                 onValueChange = { viewModel.updateFoundationDate(it) },
                 label = { Text("Gründungsdatum (TTMMJJJJ)") },
                 visualTransformation = DateVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), // KORRIGIERT: Import für KeyboardType hinzugefügt
                 modifier = Modifier.fillMaxWidth(),
                 isError = isDateError,
                 supportingText = { if (isDateError) Text("Datum ungültig", color = MaterialTheme.colorScheme.error) }
@@ -114,7 +91,7 @@ fun Step1Screen(navController: NavController, viewModel: RkwFormViewModel) {
             OutlinedTextField(value = formData.streetAndNumber, onValueChange = { viewModel.updateStreetAndNumber(it) }, label = { Text("Straße und Hausnummer") }, modifier = Modifier.fillMaxWidth())
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = formData.postalCode, onValueChange = { viewModel.updatePostalCode(it) }, label = { Text("PLZ") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f), isError = isPlzError, supportingText = { if (isPlzError) Text("PLZ ungültig", color = MaterialTheme.colorScheme.error) })
+                OutlinedTextField(value = formData.postalCode, onValueChange = { viewModel.updatePostalCode(it) }, label = { Text("PLZ") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f), isError = isPlzError, supportingText = { if (isPlzError) Text("PLZ ungültig", color = MaterialTheme.colorScheme.error) }) // KORRIGIERT: Import für KeyboardType hinzugefügt
                 OutlinedTextField(value = formData.city, onValueChange = { viewModel.updateCity(it) }, label = { Text("Ort") }, modifier = Modifier.weight(2f))
             }
 

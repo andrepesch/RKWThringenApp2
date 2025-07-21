@@ -45,7 +45,7 @@ fun Step4Screen(navController: NavController, viewModel: RkwFormViewModel) {
     var scopeDropdownExpanded by remember { mutableStateOf(false) }
 
     Scaffold(
-        topBar = { RkwAppBar() }
+        topBar = { RkwAppBar(title = "Erfassungsbogen") }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -119,13 +119,12 @@ fun Step4Screen(navController: NavController, viewModel: RkwFormViewModel) {
                     }
                 }
 
-                // **HIER IST DIE ÄNDERUNG: CurrencyVisualTransformation angewendet**
                 OutlinedTextField(
                     value = details.dailyRate,
                     onValueChange = { viewModel.updateConsultationRate(it) },
                     label = { Text("Tagessatz in €") },
                     modifier = Modifier.weight(1f),
-                    visualTransformation = CurrencyVisualTransformation(), // Formatierung angewendet
+                    visualTransformation = CurrencyVisualTransformation(),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     isError = isDailyRateError,
                     supportingText = { if (isDailyRateError) Text("Mind. 600 €") }

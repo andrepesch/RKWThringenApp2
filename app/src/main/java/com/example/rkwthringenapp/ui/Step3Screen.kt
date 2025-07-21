@@ -9,7 +9,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -31,7 +30,7 @@ fun Step3Screen(navController: NavController, viewModel: RkwFormViewModel) {
     var lastYearVisible by remember { mutableStateOf(false) }
 
     Scaffold(
-        topBar = { RkwAppBar() }
+        topBar = { RkwAppBar(title = "Erfassungsbogen") }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -179,12 +178,9 @@ fun FinancialYearCard(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // **KORRIGIERTES FELD FÜR JAHRESUMSATZ**
             OutlinedTextField(
                 value = financialYear.turnover,
                 onValueChange = { newValue ->
-                    // Diese Zeile ist der Schlüssel: Sie entfernt alle Nicht-Ziffern,
-                    // bevor die Daten im ViewModel gespeichert werden.
                     val digitsOnly = newValue.filter { it.isDigit() }
                     onUpdate(financialYear.copy(turnover = digitsOnly))
                 },
@@ -193,11 +189,9 @@ fun FinancialYearCard(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
             )
 
-            // **KORRIGIERTES FELD FÜR JAHRESBILANZSUMME**
             OutlinedTextField(
                 value = financialYear.balanceSheetTotal,
                 onValueChange = { newValue ->
-                    // Auch hier werden nur die reinen Ziffern gespeichert.
                     val digitsOnly = newValue.filter { it.isDigit() }
                     onUpdate(financialYear.copy(balanceSheetTotal = digitsOnly))
                 },
