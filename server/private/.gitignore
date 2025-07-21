@@ -1,0 +1,4 @@
+# Ignoriere alle Konfigurationsdateien mit echten Passwörtern
+app_key.php
+config.php
+db_config.php
