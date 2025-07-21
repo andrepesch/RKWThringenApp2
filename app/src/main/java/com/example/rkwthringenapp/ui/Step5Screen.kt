@@ -14,7 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Step5Screen(navController: NavController, viewModel: RkwFormViewModel) {
     val formData by viewModel.uiState.collectAsState()
@@ -22,7 +21,7 @@ fun Step5Screen(navController: NavController, viewModel: RkwFormViewModel) {
     val stepLabels = listOf("Unternehmensdaten", "Ansprechpartner", "Finanzdaten", "Beratung", "Berater", "Abschluss")
 
     Scaffold(
-        topBar = { RkwAppBar() }
+        topBar = { RkwAppBar(title = "Erfassungsbogen") }
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -92,7 +91,6 @@ fun Step5Screen(navController: NavController, viewModel: RkwFormViewModel) {
                         Card(modifier = Modifier.fillMaxWidth()) {
                             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                                    // HIER DIE ÄNDERUNG DES WORDINGS
                                     Text("Berater/in ${index + 1}", style = MaterialTheme.typography.titleMedium)
                                     IconButton(onClick = { viewModel.removeConsultant(index) }) {
                                         Icon(Icons.Default.Delete, contentDescription = "Berater entfernen")
@@ -113,7 +111,6 @@ fun Step5Screen(navController: NavController, viewModel: RkwFormViewModel) {
                         }
                     }
 
-                    // HIER DIE ÄNDERUNG: Button wird nur angezeigt, wenn weniger als 2 Berater da sind
                     if (formData.consultants.size < 2) {
                         Button(
                             onClick = { viewModel.addConsultant() },

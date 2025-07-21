@@ -22,7 +22,9 @@ import kotlinx.serialization.json.Json
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: RkwFormViewModel by viewModels()
+    // Wir holen uns das RkwFormViewModel für den Datenversand.
+    // Das AuthViewModel wird innerhalb der Navigation geholt.
+    private val rkwViewModel: RkwFormViewModel by viewModels()
 
     // Erstellen des Ktor HTTP-Clients, der für alle Anfragen wiederverwendet wird.
     private val client = HttpClient(CIO) {
@@ -30,7 +32,7 @@ class MainActivity : ComponentActivity() {
             json(Json {
                 prettyPrint = true
                 isLenient = true
-                ignoreUnknownKeys = true // Wichtig, damit die App nicht abstürzt, wenn der Server unbekannte Felder sendet.
+                ignoreUnknownKeys = true
             })
         }
     }
@@ -39,13 +41,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             RKWThüringenAppTheme {
+                // Die AppNavigation steuert jetzt den gesamten sichtbaren Inhalt.
                 AppNavigation(
-                    viewModel = viewModel,
                     onSendClick = {
                         // Starte eine Coroutine im LifecycleScope der Activity.
-                        // Das sorgt dafür, dass die Anfrage sauber abgebrochen wird, wenn die App geschlossen wird.
                         lifecycleScope.launch {
-                            sendDataToServer(viewModel.uiState.value)
+                            sendDataToServer(rkwViewModel.uiState.value)
                         }
                     }
                 )
@@ -53,33 +54,25 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    // Diese Funktion muss INNERHALB der MainActivity-Klasse sein.
     private suspend fun sendDataToServer(formData: RkwFormData) {
-        // Die URL zu deinem PHP-Skript
         val url = "https://formpilot.eu/process_form.php"
 
         try {
-            // Führe eine POST-Anfrage aus
             val response: HttpResponse = client.post(url) {
-                // Setze den Content-Type auf application/json
                 contentType(ContentType.Application.Json)
-                // Hänge das serialisierte formData-Objekt als Body an die Anfrage an
                 setBody(formData)
             }
 
-            // Werte die Antwort des Servers aus
             if (response.status == HttpStatusCode.OK) {
-                // Zeige eine Erfolgsmeldung an
                 Toast.makeText(this@MainActivity, "Anfrage erfolgreich versendet!", Toast.LENGTH_LONG).show()
-                // Optional: Formular nach erfolgreichem Versand zurücksetzen
-                viewModel.startNewForm()
+                rkwViewModel.startNewForm()
             } else {
-                // Zeige eine Fehlermeldung mit Details vom Server an
                 val errorBody = response.bodyAsText()
                 Toast.makeText(this@MainActivity, "Fehler vom Server: ${response.status.description}\n$errorBody", Toast.LENGTH_LONG).show()
             }
 
         } catch (e: Exception) {
-            // Fange generelle Netzwerkfehler ab (z.B. keine Internetverbindung)
             Toast.makeText(this@MainActivity, "Senden fehlgeschlagen: ${e.message}", Toast.LENGTH_LONG).show()
             e.printStackTrace()
         }

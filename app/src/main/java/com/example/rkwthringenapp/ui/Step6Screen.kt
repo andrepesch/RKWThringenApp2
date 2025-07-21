@@ -1,8 +1,6 @@
 package com.example.rkwthringenapp.ui
 
 import android.Manifest
-import android.app.Activity
-import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -26,6 +24,7 @@ import androidx.navigation.NavController
 import com.example.rkwthringenapp.data.RkwFormData
 import java.io.File
 import java.util.Objects
+import android.content.pm.PackageManager
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -121,7 +120,7 @@ fun Step6Screen(
         )
     }
 
-    Scaffold(topBar = { RkwAppBar() }) { paddingValues ->
+    Scaffold(topBar = { RkwAppBar(title = "Erfassungsbogen") }) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
