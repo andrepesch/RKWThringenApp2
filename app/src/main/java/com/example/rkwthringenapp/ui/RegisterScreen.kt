@@ -1,13 +1,17 @@
 package com.example.rkwthringenapp.ui
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.rkwthringenapp.R
 
 @Composable
 fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
@@ -16,6 +20,7 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
     var confirmPassword by remember { mutableStateOf("") }
     val uiState by authViewModel.uiState.collectAsState()
 
+    // Fehler-Dialog
     uiState.error?.let { error ->
         AlertDialog(
             onDismissRequest = { authViewModel.dismissError() },
@@ -29,23 +34,34 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
         )
     }
 
-    Scaffold(
-        topBar = { RkwAppBar(title = "Berater-Registrierung") }
-    ) { paddingValues ->
+    Surface(modifier = Modifier.fillMaxSize()) {
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
+                    .padding(32.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text("Neues Konto erstellen", style = MaterialTheme.typography.headlineMedium)
+                // Hinzugefügtes RKW Logo
+                Image(
+                    painter = painterResource(id = R.drawable.rkw_thueringen_logo_grau),
+                    contentDescription = "RKW Thüringen Logo",
+                    modifier = Modifier.fillMaxWidth(0.7f)
+                )
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // Angepasster Titel
+                Text(
+                    text = "Neues Beraterkonto erstellen",
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center
+                )
+
                 Spacer(modifier = Modifier.height(32.dp))
 
                 OutlinedTextField(
@@ -80,11 +96,9 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
 
                 Button(
                     onClick = {
-                        // Die Validierung findet jetzt primär im ViewModel statt
                         authViewModel.register(email, password)
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    // NEU: Verbesserte Logik für den Button-Status
                     enabled = !uiState.isLoading && email.isNotBlank() && password.length >= 8 && password == confirmPassword
                 ) {
                     Text("Registrieren")

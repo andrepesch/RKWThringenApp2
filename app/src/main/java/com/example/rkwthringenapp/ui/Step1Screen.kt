@@ -21,8 +21,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.rkwthringenapp.ui.util.DateVisualTransformation
 
-// HINWEIS: Die alte RkwAppBar-Funktion wurde von hier entfernt und in CommonUI.kt zentralisiert.
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Step1Screen(navController: NavController, viewModel: RkwFormViewModel) {
@@ -33,7 +31,7 @@ fun Step1Screen(navController: NavController, viewModel: RkwFormViewModel) {
     val legalForms = listOf("Einzelunternehmen", "GbR", "e.K.", "GmbH", "GmbH & Co. KG", "UG (haftungsbeschränkt)", "Freie Berufe", "Kommanditgesellschaft (KG)", "Offene Handelsgesellschaft (OHG)", "Aktiengesellschaft (AG)", "Limited (Ltd.)", "Ltd. & Co. KG", "e. V.", "Eingetragene Genossenschaft (eG)", "KG auf Aktien (KGaA)", "Partnerschaftsgesellschaft", "Societas Europaea (SE)", "Stiftung")
     val stepLabels = listOf("Unternehmensdaten", "Ansprechpartner", "Finanzdaten", "Beratung", "Berater", "Abschluss")
 
-    var showWzSearchDialog by remember { mutableStateOf(false) } // KORRIGIERT: mutableState -> mutableStateOf
+    var showWzSearchDialog by remember { mutableStateOf(false) }
 
     if (showWzSearchDialog) {
         WzSearchDialog(
@@ -63,7 +61,15 @@ fun Step1Screen(navController: NavController, viewModel: RkwFormViewModel) {
 
             var expanded by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-                OutlinedTextField(value = formData.legalForm.ifEmpty { "Bitte auswählen" }, onValueChange = {}, readOnly = true, label = { Text("Rechtsform") }, trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) }, modifier = Modifier.menuAnchor().fillMaxWidth())
+                OutlinedTextField(
+                    value = formData.legalForm.ifEmpty { "Bitte auswählen" },
+                    onValueChange = {},
+                    readOnly = true,
+                    label = { Text("Rechtsform") },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    // MODERNE VERSION VON menuAnchor
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
+                )
                 ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                     legalForms.forEach { form ->
                         DropdownMenuItem(
@@ -82,7 +88,7 @@ fun Step1Screen(navController: NavController, viewModel: RkwFormViewModel) {
                 onValueChange = { viewModel.updateFoundationDate(it) },
                 label = { Text("Gründungsdatum (TTMMJJJJ)") },
                 visualTransformation = DateVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), // KORRIGIERT: Import für KeyboardType hinzugefügt
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(),
                 isError = isDateError,
                 supportingText = { if (isDateError) Text("Datum ungültig", color = MaterialTheme.colorScheme.error) }
@@ -91,7 +97,7 @@ fun Step1Screen(navController: NavController, viewModel: RkwFormViewModel) {
             OutlinedTextField(value = formData.streetAndNumber, onValueChange = { viewModel.updateStreetAndNumber(it) }, label = { Text("Straße und Hausnummer") }, modifier = Modifier.fillMaxWidth())
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(value = formData.postalCode, onValueChange = { viewModel.updatePostalCode(it) }, label = { Text("PLZ") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f), isError = isPlzError, supportingText = { if (isPlzError) Text("PLZ ungültig", color = MaterialTheme.colorScheme.error) }) // KORRIGIERT: Import für KeyboardType hinzugefügt
+                OutlinedTextField(value = formData.postalCode, onValueChange = { viewModel.updatePostalCode(it) }, label = { Text("PLZ") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number), modifier = Modifier.weight(1f), isError = isPlzError, supportingText = { if (isPlzError) Text("PLZ ungültig", color = MaterialTheme.colorScheme.error) })
                 OutlinedTextField(value = formData.city, onValueChange = { viewModel.updateCity(it) }, label = { Text("Ort") }, modifier = Modifier.weight(2f))
             }
 

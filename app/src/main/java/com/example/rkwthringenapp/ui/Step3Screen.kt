@@ -53,7 +53,8 @@ fun Step3Screen(navController: NavController, viewModel: RkwFormViewModel) {
                 label = { Text("IBAN") },
                 modifier = Modifier.fillMaxWidth(),
                 visualTransformation = IbanVisualTransformation(),
-                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters, autoCorrect = false, keyboardType = KeyboardType.Ascii),
+                // MODERNE VERSION VON KeyboardOptions
+                keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters, autoCorrectEnabled = false, keyboardType = KeyboardType.Ascii),
                 isError = isIbanError,
                 supportingText = { if (isIbanError) Text("IBAN ungültig") }
             )
@@ -147,7 +148,8 @@ fun FinancialYearCard(
                     readOnly = true,
                     label = { Text("Abschlussjahr") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = yearDropdownExpanded) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                    // MODERNE VERSION VON menuAnchor
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable).fillMaxWidth()
                 )
                 ExposedDropdownMenu(
                     expanded = yearDropdownExpanded,

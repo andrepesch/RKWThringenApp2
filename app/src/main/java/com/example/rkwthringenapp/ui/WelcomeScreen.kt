@@ -7,8 +7,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -19,7 +17,9 @@ import com.example.rkwthringenapp.R
 
 @Composable
 fun WelcomeScreen(navController: NavController, viewModel: RkwFormViewModel) {
-    val hasSavedData by viewModel.hasSavedData.collectAsState()
+    // HINWEIS: Die Logik für "hasSavedData" wurde entfernt, da dieser Screen
+    // im neuen Login-Flow nicht mehr aktiv genutzt wird. Er wird nur beibehalten,
+    // um den Build-Prozess nicht zu stören.
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -29,7 +29,6 @@ fun WelcomeScreen(navController: NavController, viewModel: RkwFormViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // HINWEIS: Korrekter Dateiname für das volle Logo wird jetzt verwendet.
             Image(
                 painter = painterResource(id = R.drawable.rkw_thueringen_logo_grau),
                 contentDescription = "RKW Thüringen Logo",
@@ -44,7 +43,7 @@ fun WelcomeScreen(navController: NavController, viewModel: RkwFormViewModel) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Starten Sie eine neue Erfassung oder fahren Sie mit einem gespeicherten Entwurf fort.",
+                text = "Starten Sie eine neue Erfassung.",
                 style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
@@ -58,16 +57,6 @@ fun WelcomeScreen(navController: NavController, viewModel: RkwFormViewModel) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Neuen Erfassungsbogen anlegen")
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (hasSavedData) {
-                Button(
-                    onClick = { navController.navigate("step1") },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Mit dem letzten Stand fortfahren")
-                }
             }
         }
     }
