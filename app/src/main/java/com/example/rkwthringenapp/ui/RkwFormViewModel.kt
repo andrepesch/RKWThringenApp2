@@ -6,7 +6,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.rkwthringenapp.R
 import com.example.rkwthringenapp.data.*
-import com.google.gson.Gson
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 import io.ktor.http.*
@@ -22,15 +21,21 @@ import java.time.format.DateTimeParseException
 import java.util.*
 import android.util.Patterns
 
+sealed class SaveResult {
+    object Idle : SaveResult()
+    object Loading : SaveResult()
+    data class Success(val message: String) : SaveResult()
+    data class Error(val message: String) : SaveResult()
+}
+
 class RkwFormViewModel(application: Application) : AndroidViewModel(application) {
 
     private val _uiState = MutableStateFlow(RkwFormData())
     val uiState: StateFlow<RkwFormData> = _uiState.asStateFlow()
 
-    private val _saveStatus = MutableStateFlow<String?>(null)
-    val saveStatus: StateFlow<String?> = _saveStatus.asStateFlow()
+    private val _saveResult = MutableStateFlow<SaveResult>(SaveResult.Idle)
+    val saveResult: StateFlow<SaveResult> = _saveResult.asStateFlow()
 
-    // NEUE ZUSTÄNDE FÜR DAS LADEN VON DETAILS
     private val _isLoadingDetails = MutableStateFlow(false)
     val isLoadingDetails: StateFlow<Boolean> = _isLoadingDetails.asStateFlow()
 
@@ -56,30 +61,44 @@ class RkwFormViewModel(application: Application) : AndroidViewModel(application)
 
     fun saveForm(status: String, beraterId: Int) {
         viewModelScope.launch {
+            // NEUE PRÜFUNG: Sicherstellen, dass der Firmenname nicht leer ist
+            if (_uiState.value.companyName.isBlank()) {
+                _saveResult.value = SaveResult.Error("Bitte geben Sie zuerst einen Unternehmensnamen an (Schritt 1).")
+                return@launch
+            }
+
+            _saveResult.value = SaveResult.Loading
+
             val currentData = _uiState.value.copy(
                 status = status,
                 berater_id = beraterId
             )
+
             try {
                 val response: ServerResponse = ApiClient.client.post("https://formpilot.eu/save_form.php") {
                     contentType(ContentType.Application.Json)
                     setBody(currentData)
                 }.body()
-                _saveStatus.value = response.message
+
+                if (response.status == "success") {
+                    _saveResult.value = SaveResult.Success(response.message)
+                } else {
+                    _saveResult.value = SaveResult.Error(response.message)
+                }
+
             } catch (e: Exception) {
-                _saveStatus.value = "Fehler: ${e.message}"
+                _saveResult.value = SaveResult.Error("Client-Fehler: ${e.message}")
             }
         }
     }
 
-    fun clearSaveStatus() {
-        _saveStatus.value = null
+    fun clearSaveResult() {
+        _saveResult.value = SaveResult.Idle
     }
 
+    // --- Der Rest der Datei bleibt unverändert ---
     fun setBeraterId(id: Int) { _uiState.update { it.copy(berater_id = id) } }
     fun startNewForm() { _uiState.value = RkwFormData() }
-
-    // --- Bestehender Code (unverändert) ---
     private val _isLoading = MutableStateFlow(true)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
     private var fullWzList: List<String> = emptyList()

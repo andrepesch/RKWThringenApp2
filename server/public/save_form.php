@@ -1,8 +1,8 @@
 <?php
-// save_form.php (Vollständige Version)
-// Dieses Skript kann neue Entwürfe anlegen, bestehende aktualisieren und final senden.
+// save_form.php (Finale, vollständige Version)
+// Verarbeitet Speicheranfragen von der Berater-App und dem Kunden-Webformular.
 
-// === FEHLERBEHANDLUNG ===
+// === FEHLERBEHANDLUNG & HEADER ===
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 set_error_handler(function ($severity, $message, $file, $line) {
@@ -13,13 +13,12 @@ set_error_handler(function ($severity, $message, $file, $line) {
 
 header('Content-Type: application/json');
 
-// Composer Autoloader & Klassen importieren
+// === INCLUDES & KONFIGURATION ===
 require __DIR__ . '/vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 use setasign\Fpdi\Fpdi;
 
-// Konfigurationen laden
 $config = require __DIR__ . '/../config.php';
 $db_config = require __DIR__ . '/../db_config.php';
 $key_base_64 = require __DIR__ . '/../app_key.php';
@@ -27,51 +26,65 @@ $key_base_64 = require __DIR__ . '/../app_key.php';
 // === DATENEMPFANG & VALIDIERUNG ===
 $json_data = file_get_contents('php://input');
 $data = json_decode($json_data);
+$token = $_GET['token'] ?? null;
 
-// Wir erwarten jetzt immer Status, Berater-ID und Formulardaten
-if (!$data || !isset($data->status) || !isset($data->berater_id) || !isset($data->companyName)) {
+if (!$data || !isset($data->companyName)) {
     http_response_code(400);
-    echo json_encode(['status' => 'error', 'message' => 'Unvollständige Anfrage.']);
+    echo json_encode(['status' => 'error', 'message' => 'Unvollständige Anfrage, companyName fehlt.']);
     exit;
 }
 
-// === DATENBANK-LOGIK ===
+// === DATENBANK-VERBINDUNG ===
 try {
-    // DB-Passwort entschlüsseln
     $key = base64_decode(str_replace('base64:', '', $key_base_64));
-    $iv = base64_decode(str_replace('base64:', '', $db_config['iv']));
-    $tag = base64_decode(str_replace('base64:', '', $db_config['tag']));
-    $encrypted_pass = base64_decode(str_replace('base64:', '', $db_config['pass_encrypted']));
-    $decrypted_pass = openssl_decrypt($encrypted_pass, $db_config['cipher'], $key, OPENSSL_RAW_DATA, $iv, $tag);
+    $iv_db = base64_decode(str_replace('base64:', '', $db_config['iv']));
+    $tag_db = base64_decode(str_replace('base64:', '', $db_config['tag']));
+    $encrypted_pass_db = base64_decode(str_replace('base64:', '', $db_config['pass_encrypted']));
+    $decrypted_pass = openssl_decrypt($encrypted_pass_db, $db_config['cipher'], $key, OPENSSL_RAW_DATA, $iv_db, $tag_db);
     if ($decrypted_pass === false) throw new Exception("DB Passwort Entschlüsselung fehlgeschlagen.");
 
-    // Mit DB verbinden
     $pdo = new PDO("mysql:host={$db_config['host']};dbname={$db_config['dbname']};charset=utf8", $db_config['user'], $decrypted_pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (Exception $e) {
+    http_response_code(500);
+    error_log("DB Connection Error: " . $e->getMessage());
+    echo json_encode(['status' => 'error', 'message' => 'Server-Fehler: ' . $e->getMessage()]);
+    exit;
+}
 
-    // Entscheiden: Neuen Datensatz anlegen oder bestehenden aktualisieren?
-    if (isset($data->id) && !empty($data->id)) {
-        // UPDATE: Bestehenden Entwurf aktualisieren
-        $sql = "UPDATE formulare SET status = ?, companyName = ?, legalForm = ?, formData = ? WHERE id = ? AND berater_id = ?";
-        $params = [$data->status, $data->companyName, $data->legalForm, $json_data, $data->id, $data->berater_id];
+// === SPEICHERLOGIK ===
+try {
+    if ($token) {
+        // Fall 1: Kunde speichert über Token
+        $data->status = 'entwurf';
+        $json_data_updated = json_encode($data);
+        $sql = "UPDATE formulare SET formData = ?, status = 'entwurf', companyName = ?, legalForm = ?, share_token = NULL WHERE share_token = ?";
+        $params = [$json_data_updated, $data->companyName, $data->legalForm, $token];
+    } elseif (isset($data->berater_id)) {
+        // Fall 2: Berater speichert aus der App
+        if (isset($data->id) && !empty($data->id)) {
+            $sql = "UPDATE formulare SET status = ?, companyName = ?, legalForm = ?, formData = ? WHERE id = ? AND berater_id = ?";
+            $params = [$data->status, $data->companyName, $data->legalForm, $json_data, $data->id, $data->berater_id];
+        } else {
+            $sql = "INSERT INTO formulare (status, berater_id, companyName, legalForm, formData) VALUES (?, ?, ?, ?, ?)";
+            $params = [$data->status, $data->berater_id, $data->companyName, $data->legalForm, $json_data];
+        }
     } else {
-        // INSERT: Neuen Entwurf anlegen
-        $sql = "INSERT INTO formulare (status, berater_id, companyName, legalForm, formData) VALUES (?, ?, ?, ?, ?)";
-        $params = [$data->status, $data->berater_id, $data->companyName, $data->legalForm, $json_data];
+        throw new Exception("Anfrage konnte nicht zugeordnet werden (kein Token und keine Berater-ID).");
     }
-    
+
     $stmt = $pdo->prepare($sql);
     $stmt->execute($params);
 
 } catch (Exception $e) {
     http_response_code(500);
-    error_log("DB Error: " . $e->getMessage());
+    error_log("DB Save Error: " . $e->getMessage());
     echo json_encode(['status' => 'error', 'message' => 'Fehler beim Speichern in der Datenbank: ' . $e->getMessage()]);
     exit;
 }
 
-// === NUR BEI FINALEM SENDEN: PDF ERSTELLEN UND E-MAIL VERSCHICKEN ===
-if ($data->status === 'gesendet') {
+// === E-MAIL-VERSAND (NUR BEI FINALEM SENDEN DURCH BERATER) ===
+if (isset($data->status) && $data->status === 'gesendet') {
     try {
         // --- PDF-ERSTELLUNG ---
         $pdf = new Fpdi('P', 'mm', 'A4');
@@ -82,16 +95,8 @@ if ($data->status === 'gesendet') {
         $pdf->SetFont('Helvetica', '', 9);
         $pdf->SetTextColor(0, 0, 0);
 
-        function writeText($pdf, $x, $y, $text) {
-            $text = iconv('UTF-8', 'windows-1252//IGNORE', $text ?? '');
-            $pdf->SetXY($x, $y);
-            $pdf->Cell(0, 0, $text);
-        }
-        function writeMultiLineText($pdf, $x, $y, $w, $text) {
-            $text = iconv('UTF-8', 'windows-1252//IGNORE', $text ?? '');
-            $pdf->SetXY($x, $y);
-            $pdf->MultiCell($w, 4, $text);
-        }
+        function writeText($pdf, $x, $y, $text) { $text = iconv('UTF-8', 'windows-1252//IGNORE', $text ?? ''); $pdf->SetXY($x, $y); $pdf->Cell(0, 0, $text); }
+        function writeMultiLineText($pdf, $x, $y, $w, $text) { $text = iconv('UTF-8', 'windows-1252//IGNORE', $text ?? ''); $pdf->SetXY($x, $y); $pdf->MultiCell($w, 4, $text); }
         
         // --- PLATZIERUNG DER DATEN ---
         writeText($pdf, 44, 47, $data->companyName ?? '');
@@ -104,53 +109,19 @@ if ($data->status === 'gesendet') {
         writeText($pdf, 44, 68, $data->mainContact->name ?? '');
         writeText($pdf, 77, 68, $data->mainContact->phone ?? '');
         writeText($pdf, 139, 68, $data->mainContact->email ?? '');
-        if (isset($data->beneficialOwners) && is_array($data->beneficialOwners)) {
-            $yPos = 81;
-            foreach ($data->beneficialOwners as $owner) {
-                writeText($pdf, 20, $yPos, $owner->lastName ?? '');
-                writeText($pdf, 56, $yPos, $owner->firstName ?? '');
-                writeText($pdf, 89, $yPos, $owner->birthDate ?? '');
-                writeText($pdf, 139, $yPos, $owner->taxId ?? '');
-                $yPos += 5.5;
-            }
-        }
+        if (isset($data->beneficialOwners) && is_array($data->beneficialOwners)) { $yPos = 81; foreach ($data->beneficialOwners as $owner) { writeText($pdf, 20, $yPos, $owner->lastName ?? ''); writeText($pdf, 56, $yPos, $owner->firstName ?? ''); writeText($pdf, 89, $yPos, $owner->birthDate ?? ''); writeText($pdf, 139, $yPos, $owner->taxId ?? ''); $yPos += 5.5; } }
         writeText($pdf, 20, 94, $data->industrySector ?? '');
         if ($data->hasWebsite ?? false) writeText($pdf, 120, 94, 'X'); else writeText($pdf, 130, 94, 'X');
         writeText($pdf, 139, 94, $data->websiteUrl ?? '');
         writeText($pdf, 44, 111, $data->bankDetails->institute ?? '');
         writeText($pdf, 69, 111, $data->bankDetails->iban ?? '');
         writeText($pdf, 139, 111, $data->bankDetails->taxId ?? '');
-        if (isset($data->smeClassification)) {
-            writeText($pdf, 81, 128, $data->smeClassification->penultimateYear->employees ?? '0');
-            writeText($pdf, 81, 132.5, ($data->smeClassification->penultimateYear->turnover ?? '0') . ' €');
-            writeText($pdf, 81, 137, ($data->smeClassification->penultimateYear->balanceSheetTotal ?? '0') . ' €');
-            writeText($pdf, 122, 128, $data->smeClassification->lastYear->employees ?? '0');
-            writeText($pdf, 122, 132.5, ($data->smeClassification->lastYear->turnover ?? '0') . ' €');
-            writeText($pdf, 122, 137, ($data->smeClassification->lastYear->balanceSheetTotal ?? '0') . ' €');
-        }
-        if (isset($data->consultationDetails)) {
-            writeText($pdf, 20, 148, $data->consultationDetails->focus ?? '');
-            writeText($pdf, 81, 148, ($data->consultationDetails->scopeInDays ?? '') . ' Tage');
-            writeText($pdf, 122, 148, ($data->consultationDetails->dailyRate ?? '') . ' €');
-            writeText($pdf, 164, 148, $data->consultationDetails->endDate ?? '');
-            writeMultiLineText($pdf, 20, 161.5, 172, $data->consultationDetails->initialSituation ?? '');
-            writeMultiLineText($pdf, 20, 181, 172, $data->consultationDetails->consultationContent ?? '');
-        }
+        if (isset($data->smeClassification)) { writeText($pdf, 81, 128, $data->smeClassification->penultimateYear->employees ?? '0'); writeText($pdf, 81, 132.5, ($data->smeClassification->penultimateYear->turnover ?? '0') . ' €'); writeText($pdf, 81, 137, ($data->smeClassification->penultimateYear->balanceSheetTotal ?? '0') . ' €'); writeText($pdf, 122, 128, $data->smeClassification->lastYear->employees ?? '0'); writeText($pdf, 122, 132.5, ($data->smeClassification->lastYear->turnover ?? '0') . ' €'); writeText($pdf, 122, 137, ($data->smeClassification->lastYear->balanceSheetTotal ?? '0') . ' €'); }
+        if (isset($data->consultationDetails)) { writeText($pdf, 20, 148, $data->consultationDetails->focus ?? ''); writeText($pdf, 81, 148, ($data->consultationDetails->scopeInDays ?? '') . ' Tage'); writeText($pdf, 122, 148, ($data->consultationDetails->dailyRate ?? '') . ' €'); writeText($pdf, 164, 148, $data->consultationDetails->endDate ?? ''); writeMultiLineText($pdf, 20, 161.5, 172, $data->consultationDetails->initialSituation ?? ''); writeMultiLineText($pdf, 20, 181, 172, $data->consultationDetails->consultationContent ?? ''); }
         writeText($pdf, 23, 223, $data->consultingFirm ?? '');
-        if (isset($data->consultants) && is_array($data->consultants)) {
-            $yPos = 230;
-            foreach ($data->consultants as $consultant) {
-                writeText($pdf, 23, $yPos, $consultant->lastName ?? '');
-                writeText($pdf, 56, $yPos, $consultant->firstName ?? '');
-                writeText($pdf, 89, $yPos, $consultant->accreditationId ?? '');
-                writeText($pdf, 139, $yPos, $consultant->email ?? '');
-                $yPos += 5.5;
-            }
-        }
-        if ($data->hasAcknowledgedPublicationObligations ?? false) {
-            writeText($pdf, 181, 253, 'X');
-        }
-
+        if (isset($data->consultants) && is_array($data->consultants)) { $yPos = 230; foreach ($data->consultants as $consultant) { writeText($pdf, 23, $yPos, $consultant->lastName ?? ''); writeText($pdf, 56, $yPos, $consultant->firstName ?? ''); writeText($pdf, 89, $yPos, $consultant->accreditationId ?? ''); writeText($pdf, 139, $yPos, $consultant->email ?? ''); $yPos += 5.5; } }
+        if ($data->hasAcknowledgedPublicationObligations ?? false) { writeText($pdf, 181, 253, 'X'); }
+        
         $pdf_content = $pdf->Output('S');
 
         // --- E-MAIL-VERSAND ---
@@ -187,8 +158,7 @@ if ($data->status === 'gesendet') {
         echo json_encode(['status' => 'error', 'message' => 'Fehler bei PDF-Erstellung oder E-Mail-Versand.']);
     }
 } else {
-    // Wenn nur als Entwurf gespeichert wurde
-    echo json_encode(['status' => 'success', 'message' => 'Entwurf erfolgreich gespeichert.']);
+    // Erfolgsmeldung für Entwürfe (vom Berater oder Kunden)
+    echo json_encode(['status' => 'success', 'message' => 'Änderungen erfolgreich gespeichert.']);
 }
-
 ?>

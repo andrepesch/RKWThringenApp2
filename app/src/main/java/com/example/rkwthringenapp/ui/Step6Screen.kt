@@ -3,6 +3,7 @@ package com.example.rkwthringenapp.ui
 import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
@@ -31,93 +32,61 @@ import java.util.Objects
 fun Step6Screen(
     navController: NavController,
     viewModel: RkwFormViewModel,
-    authViewModel: AuthViewModel // Hinzugefügt, um die berater_id zu bekommen
+    authViewModel: AuthViewModel
 ) {
     val formData by viewModel.uiState.collectAsState()
     val authState by authViewModel.uiState.collectAsState()
-    val saveStatus by viewModel.saveStatus.collectAsState()
-
+    val saveResult by viewModel.saveResult.collectAsState()
     val context = LocalContext.current
+
+    // Reagiert auf das Speicherergebnis
+    when (val result = saveResult) {
+        is SaveResult.Loading -> {
+            // Zeigt einen Lade-Dialog, der nicht weggeklickt werden kann
+            AlertDialog(
+                onDismissRequest = { /* Nichts tun */ },
+                title = { Text("Speichern...") },
+                text = {
+                    Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxWidth()) {
+                        CircularProgressIndicator()
+                    }
+                },
+                confirmButton = {}
+            )
+        }
+        is SaveResult.Success -> {
+            // Zeigt eine Erfolgsmeldung und navigiert dann zurück
+            LaunchedEffect(result) {
+                Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                navController.navigate("dashboard") {
+                    popUpTo("dashboard") { inclusive = true }
+                }
+                viewModel.clearSaveResult()
+            }
+        }
+        is SaveResult.Error -> {
+            // Zeigt einen Fehler-Dialog
+            AlertDialog(
+                onDismissRequest = { viewModel.clearSaveResult() },
+                title = { Text("Fehler beim Speichern") },
+                text = { Text(result.message) },
+                confirmButton = {
+                    Button(onClick = { viewModel.clearSaveResult() }) {
+                        Text("OK")
+                    }
+                }
+            )
+        }
+        is SaveResult.Idle -> { /* Nichts tun */ }
+    }
+
+    // --- Der Rest des Screens bleibt größtenteils gleich ---
     var tempImageUri by remember { mutableStateOf<Uri?>(null) }
     var showPublicationInfoDialog by remember { mutableStateOf(false) }
-
-    // Zeigt eine Bestätigung nach dem Speichern/Senden und navigiert zurück
-    LaunchedEffect(saveStatus) {
-        if (saveStatus != null) {
-            // Navigiere zum Dashboard zurück
-            navController.navigate("dashboard") {
-                // Löscht den gesamten Formularverlauf aus dem Backstack
-                popUpTo("dashboard") { inclusive = true }
-            }
-            // Setzt den Status zurück, um eine Endlosschleife zu vermeiden
-            viewModel.clearSaveStatus()
-        }
-    }
-
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicture(),
-        onResult = { success ->
-            if (success) {
-                tempImageUri?.let { viewModel.addDocument(it) }
-            }
-        }
-    )
-
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-        onResult = { uri: Uri? ->
-            uri?.let { viewModel.addDocument(it) }
-        }
-    )
-
-    fun launchCamera() {
-        val tempFile = File.createTempFile("temp_image_", ".jpg", context.cacheDir)
-        val uri = FileProvider.getUriForFile(
-            Objects.requireNonNull(context),
-            context.packageName + ".provider", tempFile
-        )
-        tempImageUri = uri
-        cameraLauncher.launch(uri)
-    }
-
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            launchCamera()
-        }
-    }
-
-    if (showPublicationInfoDialog) {
-        AlertDialog(
-            onDismissRequest = { showPublicationInfoDialog = false },
-            title = { Text("Publizitätspflichten") },
-            text = {
-                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                    Text(
-                        text = "Einzuhaltende Publizitätspflichten im Rahmen der Thüringer Beratungsrichtlinie",
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    Text(
-                        text = "Grundlage der Publizitätspflicht",
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "Zur Erfüllung und Einhaltung der Publizitätspflicht sind alle Antragstellenden gemäß Artikel 47 und Artikel 50 Abs. 1 i.V.m. Anhang IX der Verordnung (EU) 2021/1060 verpflichtet. Während der Durchführung eines ESF Plus geförderten Vorhaben ist über die Förderung aus dem ESF Plus zu informieren und in der Öffentlichkeitsarbeit sichtbar zu machen.",
-                        style = MaterialTheme.typography.bodySmall,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    // ... (restlicher Text)
-                }
-            },
-            confirmButton = {
-                Button(onClick = { showPublicationInfoDialog = false }) {
-                    Text("Schließen")
-                }
-            }
-        )
-    }
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success -> if (success) { tempImageUri?.let { viewModel.addDocument(it) } } }
+    val filePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? -> uri?.let { viewModel.addDocument(it) } }
+    fun launchCamera() { val tempFile = File.createTempFile("temp_image_", ".jpg", context.cacheDir); val uri = FileProvider.getUriForFile(Objects.requireNonNull(context), context.packageName + ".provider", tempFile); tempImageUri = uri; cameraLauncher.launch(uri) }
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted -> if (isGranted) { launchCamera() } }
 
     Scaffold(topBar = { RkwAppBar(title = "Erfassungsbogen") }) { paddingValues ->
         Column(
@@ -131,106 +100,43 @@ fun Step6Screen(
             Spacer(modifier = Modifier.height(8.dp))
             ProgressStepper(currentStep = 6, stepLabels = listOf("Unternehmensdaten", "Ansprechpartner", "Finanzdaten", "Beratung", "Berater", "Abschluss"))
             Spacer(modifier = Modifier.height(8.dp))
-
             Text("Dokumente & Versand", style = MaterialTheme.typography.titleLarge)
-
-            // Logik für benötigte Dokumente (unverändert)
-            val requiredDocs = when (formData.legalForm) {
-                "Einzelunternehmen", "GbR" -> listOf("Gewerbeanmeldung / -ummeldung", "Gesellschaftsvertrag (bei GbR)")
-                else -> emptyList()
+            val requiredDocs = when (formData.legalForm) { "Einzelunternehmen", "GbR" -> listOf("Gewerbeanmeldung / -ummeldung", "Gesellschaftsvertrag (bei GbR)"); else -> emptyList() }
+            if (requiredDocs.isNotEmpty()) { Text("Benötigte Anlagen für Ihre Rechtsform:", style = MaterialTheme.typography.titleMedium); Card(modifier = Modifier.fillMaxWidth()) { Column(modifier = Modifier.padding(16.dp)) { requiredDocs.forEach { doc -> Text("• $doc", style = MaterialTheme.typography.bodyMedium) } } } }
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(onClick = { filePickerLauncher.launch("application/pdf, image/*") }, modifier = Modifier.weight(1f)) { Text("Dokument auswählen") }
+                Button(onClick = { when (PackageManager.PERMISSION_GRANTED) { ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> launchCamera(); else -> cameraPermissionLauncher.launch(Manifest.permission.CAMERA) } }, modifier = Modifier.weight(1f)) { Text("Dokument fotografieren") }
             }
-            if (requiredDocs.isNotEmpty()) {
-                Text("Benötigte Anlagen für Ihre Rechtsform:", style = MaterialTheme.typography.titleMedium)
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        requiredDocs.forEach { doc ->
-                            Text("• $doc", style = MaterialTheme.typography.bodyMedium)
-                        }
-                    }
-                }
-            }
-
-            // Buttons für Dokumenten-Upload (unverändert)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Button(
-                    onClick = { filePickerLauncher.launch("application/pdf, image/*") },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Dokument auswählen")
-                }
-                Button(
-                    onClick = {
-                        when (PackageManager.PERMISSION_GRANTED) {
-                            ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) -> launchCamera()
-                            else -> cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-                        }
-                    },
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text("Dokument fotografieren")
-                }
-            }
-
-            // Angehängte Dokumente (unverändert)
             Text("Angehängte Dokumente:", style = MaterialTheme.typography.titleMedium)
-            if (formData.attachedDocuments.isEmpty()) {
-                Text("Keine Dokumente angehängt.", style = MaterialTheme.typography.bodyMedium)
-            } else {
-                formData.attachedDocuments.forEach { uriString ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(Uri.parse(uriString).path?.substringAfterLast(':')?.substringAfterLast('/') ?: "Unbekannte Datei", modifier = Modifier.weight(1f))
-                        IconButton(onClick = { viewModel.removeDocument(uriString) }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Dokument entfernen")
-                        }
-                    }
-                }
-            }
-
+            if (formData.attachedDocuments.isEmpty()) { Text("Keine Dokumente angehängt.", style = MaterialTheme.typography.bodyMedium) } else { formData.attachedDocuments.forEach { uriString -> Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) { Text(Uri.parse(uriString).path?.substringAfterLast(':')?.substringAfterLast('/') ?: "Unbekannte Datei", modifier = Modifier.weight(1f)); IconButton(onClick = { viewModel.removeDocument(uriString) }) { Icon(Icons.Default.Delete, contentDescription = "Dokument entfernen") } } } }
             HorizontalDivider()
-
-            // Zusammenfassung (unverändert)
             Text("Zusammenfassung zur Prüfung:", style = MaterialTheme.typography.titleMedium)
             SummaryView(formData = formData)
-
-            // Publizitätspflichten (unverändert)
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Checkbox(
-                    checked = formData.hasAcknowledgedPublicationObligations,
-                    onCheckedChange = { viewModel.updateAcknowledgement(it) }
-                )
+                Checkbox(checked = formData.hasAcknowledgedPublicationObligations, onCheckedChange = { viewModel.updateAcknowledgement(it) })
                 Text("Ich habe die Publizitätsverpflichtungen zur Kenntnis genommen.", style = MaterialTheme.typography.bodySmall, lineHeight = MaterialTheme.typography.bodySmall.fontSize * 1.2)
-                IconButton(onClick = { showPublicationInfoDialog = true }) {
-                    Icon(Icons.Outlined.Info, contentDescription = "Information anzeigen")
-                }
+                IconButton(onClick = { showPublicationInfoDialog = true }) { Icon(Icons.Outlined.Info, contentDescription = "Information anzeigen") }
             }
 
-            // NEUE, FUNKTIONALE BUTTONS
+            // Buttons, die jetzt durch den Ladezustand deaktiviert werden
+            val isLoading = saveResult is SaveResult.Loading
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp),
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Button(onClick = { navController.popBackStack() }) { Text("Zurück") }
-
+                Button(onClick = { navController.popBackStack() }, enabled = !isLoading) { Text("Zurück") }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = {
-                        authState.beraterId?.let { viewModel.saveForm("entwurf", it) }
-                    }) {
+                    OutlinedButton(
+                        onClick = { authState.beraterId?.let { viewModel.saveForm("entwurf", it) } },
+                        enabled = !isLoading
+                    ) {
                         Text("Als Entwurf speichern")
                     }
-
-                    Button(onClick = {
-                        authState.beraterId?.let { viewModel.saveForm("gesendet", it) }
-                    }, enabled = formData.hasAcknowledgedPublicationObligations) {
+                    Button(
+                        onClick = { authState.beraterId?.let { viewModel.saveForm("gesendet", it) } },
+                        enabled = !isLoading && formData.hasAcknowledgedPublicationObligations
+                    ) {
                         Text("Final Senden")
                     }
                 }
@@ -239,9 +145,9 @@ fun Step6Screen(
     }
 }
 
-// SummaryView bleibt unverändert
 @Composable
 fun SummaryView(formData: RkwFormData) {
+    // ... (unverändert)
     Column(
         modifier = Modifier
             .fillMaxWidth()
