@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.rkwthringenapp.data.FormSummary
@@ -43,12 +44,13 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel) 
         },
         floatingActionButton = {
             FloatingActionButton(onClick = {
-                rkwFormViewModel.startNewForm() // Wichtig: Formular zurücksetzen
+                rkwFormViewModel.startNewForm()
                 navController.navigate("step1")
             }) {
                 Icon(Icons.Default.Add, contentDescription = "Neuen Bogen anlegen")
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest
     ) { paddingValues ->
         Box(
             modifier = Modifier.fillMaxSize().padding(paddingValues),
@@ -69,7 +71,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel) 
                 ) {
                     groupedForms["entwurf"]?.let { drafts ->
                         item {
-                            Text("ENTWÜRFE", style = MaterialTheme.typography.titleMedium)
+                            Text("ENTWÜRFE", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 8.dp))
                         }
                         items(drafts) { form ->
                             FormCard(form = form, onClick = {
@@ -80,7 +82,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel) 
                     }
                     groupedForms["gesendet"]?.let { sentForms ->
                         item {
-                            Text("GESENDET", style = MaterialTheme.typography.titleMedium)
+                            Text("GESENDET", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(bottom = 8.dp, top = 16.dp))
                         }
                         items(sentForms) { form ->
                             FormCard(form = form, onClick = {
@@ -96,51 +98,71 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel) 
 
 @Composable
 fun FormCard(form: FormSummary, onClick: () -> Unit) {
+    // Farben basierend auf dem Status definieren
+    val headerColor = if (form.status == "entwurf") Color(0xFF004A5A) else Color(0xFF5A6A62) // Dunkles Türkis für Entwurf, Grau-Grün für Gesendet
+    val headerTextColor = Color.White
+    val bodyColor = MaterialTheme.colorScheme.surface
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = bodyColor)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        Column {
+            // Kopfzeile mit farblichem Hintergrund
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(headerColor)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                Text(form.companyName, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = if (form.status == "entwurf") Color.Blue.copy(alpha = 0.1f) else Color.Green.copy(alpha = 0.1f),
-                            shape = MaterialTheme.shapes.small
-                        )
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                ) {
-                    Text(
-                        text = form.status.uppercase(),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = if (form.status == "entwurf") Color.Blue else Color.Green
-                    )
-                }
+                Text(
+                    text = form.companyName,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = headerTextColor,
+                    fontWeight = FontWeight.Bold
+                )
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            Text("Tagwerke: ${form.scopeInDays}", style = MaterialTheme.typography.bodyMedium)
-            Text("Honorar: ${form.honorar} €", style = MaterialTheme.typography.bodyMedium)
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = if (form.status == "entwurf") "Zuletzt bearbeitet: ${formatDate(form.updated_at)}" else "Gesendet am: ${formatDate(form.updated_at)}",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.Gray
-            )
+
+            // Inhaltsbereich
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = form.address,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Text(
+                    text = form.mainContact,
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "${form.scopeInDays} Tagwerk zu ${form.dailyRate} Euro",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = if (form.status == "entwurf") "letzte Bearbeitung ${formatDate(form.updated_at)}" else "gesendet am ${formatDate(form.updated_at)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Gray,
+                    fontSize = 10.sp
+                )
+            }
         }
     }
 }
 
+// Die formatDate-Funktion bleibt unverändert
 fun formatDate(dateString: String): String {
     return try {
         val parser = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.GERMANY)
-        val formatter = SimpleDateFormat("dd.MM.yyyy, HH:mm 'Uhr'", Locale.GERMANY)
+        val formatter = SimpleDateFormat("dd.MM.yyyy", Locale.GERMANY) // Nur Datum, ohne Uhrzeit
         formatter.format(parser.parse(dateString)!!)
     } catch (e: Exception) {
         dateString // Fallback

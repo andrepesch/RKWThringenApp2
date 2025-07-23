@@ -1,5 +1,5 @@
 <?php
-// get_forms.php (aktualisiert)
+// get_forms.php (Korrigierte Version für das neue Kartendesign)
 
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
@@ -39,15 +39,21 @@ $forms = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $results = [];
 foreach ($forms as $form) {
     $formData = json_decode($form['formData']);
+    
+    // Alle benötigten Felder sicher aus dem JSON extrahieren
     $dailyRate = $formData->consultationDetails->dailyRate ?? 0;
     $scopeInDays = $formData->consultationDetails->scopeInDays ?? 0;
-    
+    $address = trim(($formData->streetAndNumber ?? '') . ', ' . ($formData->postalCode ?? '') . ' ' . ($formData->city ?? ''), ', ');
+    $mainContact = $formData->mainContact->name ?? 'Kein Ansprechpartner';
+
     $results[] = [
         'id' => $form['id'],
         'status' => $form['status'],
         'companyName' => $form['companyName'],
+        'address' => $address,
+        'mainContact' => $mainContact,
         'scopeInDays' => $scopeInDays,
-        'honorar' => (int)$dailyRate * (int)$scopeInDays,
+        'dailyRate' => (int)$dailyRate,
         'updated_at' => $form['updated_at']
     ];
 }

@@ -2,22 +2,23 @@ package com.example.rkwthringenapp.data
 
 import kotlinx.serialization.Serializable
 
-// Definiert, wie ein einzelner Eintrag in der Dashboard-Liste aussieht.
-// Angepasst an die neue JSON-Antwort von get_forms.php
+// Angepasst mit Standardwerten, um die App robuster zu machen
 @Serializable
 data class FormSummary(
     val id: Int,
     val status: String,
     val companyName: String,
-    val scopeInDays: Int,
-    val honorar: Int,
+    val address: String = "", // Standardwert: leerer Text
+    val mainContact: String = "", // Standardwert: leerer Text
+    val scopeInDays: Int = 0, // Standardwert: 0
+    val dailyRate: Int = 0, // Standardwert: 0
     val updated_at: String
 )
 
-// Definiert die neue Antwort vom login.php-Skript
+// LoginResponse bleibt unverändert
 @Serializable
 data class LoginResponse(
     val status: String,
     val message: String,
-    val berater_id: Int? = null // Die ID des Beraters
+    val berater_id: Int? = null
 )
