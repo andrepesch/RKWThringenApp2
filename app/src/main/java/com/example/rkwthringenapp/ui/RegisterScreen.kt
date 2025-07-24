@@ -2,6 +2,7 @@ package com.example.rkwthringenapp.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,21 +21,22 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
     var confirmPassword by remember { mutableStateOf("") }
     val uiState by authViewModel.uiState.collectAsState()
 
-    // Fehler-Dialog
+    // Fehler-Dialog (unverändert)
     uiState.error?.let { error ->
         AlertDialog(
             onDismissRequest = { authViewModel.dismissError() },
             title = { Text("Fehler") },
             text = { Text(error) },
             confirmButton = {
-                Button(onClick = { authViewModel.dismissError() }) {
-                    Text("OK")
-                }
+                Button(onClick = { authViewModel.dismissError() }) { Text("OK") }
             }
         )
     }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -46,30 +48,27 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // Hinzugefügtes RKW Logo
                 Image(
                     painter = painterResource(id = R.drawable.rkw_thueringen_logo_grau),
                     contentDescription = "RKW Thüringen Logo",
                     modifier = Modifier.fillMaxWidth(0.7f)
                 )
+                Spacer(modifier = Modifier.height(48.dp))
 
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Angepasster Titel
                 Text(
                     text = "Neues Beraterkonto erstellen",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.headlineSmall,
                     textAlign = TextAlign.Center
                 )
-
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
                     value = email,
                     onValueChange = { email = it },
                     label = { Text("E-Mail") },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = !uiState.isLoading
+                    enabled = !uiState.isLoading,
+                    shape = RoundedCornerShape(12.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -79,7 +78,8 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                     label = { Text("Passwort (mind. 8 Zeichen)") },
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = !uiState.isLoading
+                    enabled = !uiState.isLoading,
+                    shape = RoundedCornerShape(12.dp)
                 )
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -90,16 +90,16 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                     visualTransformation = PasswordVisualTransformation(),
                     modifier = Modifier.fillMaxWidth(),
                     enabled = !uiState.isLoading,
-                    isError = password != confirmPassword && confirmPassword.isNotEmpty()
+                    isError = password != confirmPassword && confirmPassword.isNotEmpty(),
+                    shape = RoundedCornerShape(12.dp)
                 )
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
-                    onClick = {
-                        authViewModel.register(email, password)
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = !uiState.isLoading && email.isNotBlank() && password.length >= 8 && password == confirmPassword
+                    onClick = { authViewModel.register(email, password) },
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    enabled = !uiState.isLoading && email.isNotBlank() && password.length >= 8 && password == confirmPassword,
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Text("Registrieren")
                 }
